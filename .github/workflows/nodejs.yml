@@ -23,9 +23,14 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm install
-    - run: tsc
-    - name: Add Database URI
-      run: echo DATABASE_URI=${{ secrets.DATABASE_URI }} >> .env
+    - name: tsc
+      uses: icrawl/action-tsc@v1
+    - name: Create env file
+      run: |
+        touch .env
+        echo PORT=80 >> .env
+        echo DATABASE_URI=${{ secrets.DATABASE_URI }} >> .env
+        cat .env
 
   deploy:
 
