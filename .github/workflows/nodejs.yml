@@ -24,6 +24,8 @@ jobs:
         cache: 'npm'
     - run: npm install
     - run: tsc
+    - name: Add Database URI
+      run: echo DATABASE_URI=${{ secrets.DATABASE_URI }} >> .env
 
   deploy:
 
