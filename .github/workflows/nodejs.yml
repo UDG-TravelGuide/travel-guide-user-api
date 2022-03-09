@@ -27,8 +27,8 @@ jobs:
       uses: icrawl/action-tsc@v1
 
 
- deploy:
-
+  deploy:
+    
     runs-on: ubuntu-latest
 
     needs: [build]
