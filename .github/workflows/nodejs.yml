@@ -31,16 +31,8 @@ jobs:
         echo PORT=80 >> .env
         echo DATABASE_URI=${{ secrets.DATABASE_URI }} >> .env
         cat .env
-
-  deploy:
-
-    runs-on: ubuntu-latest
-
-    needs: [build]
-
-    steps:
-    - uses: actions/checkout@v2
-    - uses: AkhileshNS/heroku-deploy@v3.12.12
+    - name: deploy
+      uses: AkhileshNS/heroku-deploy@v3.12.12
       with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "travelguideuserapi"
