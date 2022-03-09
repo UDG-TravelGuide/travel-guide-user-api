@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "postinstall": "tsc"
   },
   "repository": {
     "type": "git",
