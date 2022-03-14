@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { check } from 'express-validator'; // TODO: Afegir validadors
+import { verifyToken } from '../middlewares/auth';
 import { 
     getUsers, 
     getUser,
@@ -11,14 +12,24 @@ import {
 
 export const UserRouter: Router = Router();
 
-UserRouter.get('/', getUsers);
+UserRouter.get('/', [
+    verifyToken
+], getUsers);
 
-UserRouter.get('/:id', getUser);
+UserRouter.get('/:id', [
+    verifyToken
+], getUser);
 
-UserRouter.post('/new', createUser);
+UserRouter.post('/new', [
+    verifyToken
+], createUser);
 
 UserRouter.post('/login', loginUser);
 
-UserRouter.put('/edit/:id', editUser);
+UserRouter.put('/edit/:id', [
+    verifyToken
+], editUser);
 
-UserRouter.delete('/delete/:id', deleteUser);
+UserRouter.delete('/delete/:id', [
+    verifyToken
+], deleteUser);

@@ -1,6 +1,6 @@
 import { response, request } from 'express';
 import { hash, genSalt, compare } from 'bcryptjs'
-import { verify, sign } from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 import { UserCreate, UserEdit, UserLogin } from '../interfaces/UserInterfaces';
 import { User } from '../models/User';
 
