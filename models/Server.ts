@@ -15,7 +15,7 @@ export class Server {
 
         // Configuració del servidor
         this._app = express();
-        this._port = Number( process.env.PORT || 5000 );
+        this._port = Number( process.env.PORT || '5000' );
 
         // Middlewares
         this._initMiddlewares();
@@ -42,6 +42,12 @@ export class Server {
     }
 
     private _initRoutes(): void {
+        this._app.get('/', (_, res) => {
+            res.status(200).json({
+                message: `API funcionant correctament`
+            });
+        });
+
         this._app.use( Paths.UsersPath, UserRouter );
     }
 }
