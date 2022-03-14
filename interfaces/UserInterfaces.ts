@@ -11,3 +11,8 @@ export interface UserEdit {
     birthDate: string;
     profilePhoto: string;
 }
+
+export interface UserLogin {
+    email: string;
+    password: string;
+}
