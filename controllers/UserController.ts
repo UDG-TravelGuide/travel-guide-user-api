@@ -5,7 +5,7 @@ import { User } from '../models/User';
 export const getUsers = async( _ = request, res = response ): Promise<void> => {
     try {
         const users = await User.findAll();
-        if (users instanceof Array) {
+        if (users instanceof Array && users.length > 0) {
             res.json( users );
         } else {
             res.json( [] );
@@ -23,7 +23,7 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     
     try {
         const user = await User.findAll({ where: { id: params.id } });
-        if (user instanceof Array) {
+        if (user instanceof Array && user.length > 0) {
             res.json( user[0] );
         } else {
             res.status(400).json({
@@ -79,9 +79,7 @@ export const editUser = async( req = request, res = response ): Promise<void> =>
                     where: { id: params.id }
                 });
                 user[0].save();
-                res.status(200).json({
-                    message: `S'ha editat correctament l'usuari`
-                });
+                res.status(200).json( user[0] );
             } catch (error) {
                 res.status(500).json({
                     message: `Error al editar l'usuari amb id: ${ params.id }`
