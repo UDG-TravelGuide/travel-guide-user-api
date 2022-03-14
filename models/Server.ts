@@ -15,7 +15,7 @@ export class Server {
 
         // Configuració del servidor
         this._app = express();
-        this._port = Number( '5000' );
+        this._port = Number( process.env.PORT || '5000' );
 
         // Middlewares
         this._initMiddlewares();
