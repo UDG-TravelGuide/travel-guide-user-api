@@ -37,7 +37,7 @@ UserRouter.put('/edit/:id', [
     verifyToken,
     check('userName').not().isEmpty(),
     check('password').not().isEmpty(),
-    check('birthDate').isDate()
+    check('birthDate').isDate({ format: 'DD-MM-YYYY' })
 ], editUser);
 
 UserRouter.delete('/delete/:id', [
