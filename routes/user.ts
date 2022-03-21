@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { check } from 'express-validator'; // TODO: Afegir validadors
+import { check } from 'express-validator';
 import { verifyToken } from '../middlewares/auth';
 import { 
     getUsers, 
@@ -21,13 +21,23 @@ UserRouter.get('/:id', [
 ], getUser);
 
 UserRouter.post('/new', [
-    verifyToken
+    verifyToken,
+    check('email').isEmail().withMessage('El correu electrònic té un format incorrecte'),
+    check('userName').not().isEmpty(),
+    check('password').not().isEmpty(),
+    check('birthDate').not().isEmpty()
 ], createUser);
 
-UserRouter.post('/login', loginUser);
+UserRouter.post('/login', [
+    check('email').isEmail().withMessage('El correu electrònic té un format incorrecte'),
+    check('password').not().isEmpty()
+], loginUser);
 
 UserRouter.put('/edit/:id', [
-    verifyToken
+    verifyToken,
+    check('userName').not().isEmpty(),
+    check('password').not().isEmpty(),
+    check('birthDate').isDate()
 ], editUser);
 
 UserRouter.delete('/delete/:id', [

@@ -8,8 +8,8 @@ export interface UserCreate {
 export interface UserEdit {
     userName: string;
     password: string;
-    birthDate: string;
-    profilePhoto: string;
+    birthDate?: string;
+    profilePhoto?: string;
 }
 
 export interface UserLogin {
