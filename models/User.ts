@@ -45,4 +45,4 @@ const getUser = () => {
     return userModel;
 }
 
-export const User = getUser();
+export const UserModel = getUser();

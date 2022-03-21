@@ -2,11 +2,11 @@ import { response, request } from 'express';
 import { hash, genSalt, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken';
 import { UserCreate, UserEdit, UserLogin } from '../interfaces/UserInterfaces';
-import { User } from '../models/User';
+import { UserModel } from '../models/User';
 
 export const getUsers = async( _ = request, res = response ): Promise<void> => {
     try {
-        const users = await User.findAll();
+        const users = await UserModel.findAll();
         if (users instanceof Array && users.length > 0) {
             res.json( users );
         } else {
@@ -24,7 +24,7 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     const params = req.params;
     
     try {
-        const user = await User.findAll({ where: { id: params.id } });
+        const user = await UserModel.findAll({ where: { id: params.id } });
         if (user instanceof Array && user.length > 0) {
             res.json( user[0] );
         } else {
@@ -40,6 +40,7 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     }
 }
 
+// TODO: Evitar mails repetits
 export const createUser = async( req = request, res = response ): Promise<void> => {
     const body: UserCreate = req.body;
     
@@ -54,7 +55,7 @@ export const createUser = async( req = request, res = response ): Promise<void> 
             birthDate: body.birthDate
         };
 
-        const user = await User.create(newUser);
+        const user = await UserModel.create(newUser);
         user.save();
         res.status(200).json( user );
     } catch (error) {
@@ -65,11 +66,12 @@ export const createUser = async( req = request, res = response ): Promise<void> 
     }
 }
 
+// TODO: Evitar editar mail
 export const editUser = async( req = request, res = response ): Promise<void> => {
     const params: any = req.params;
     const body: UserEdit = req.body;
 
-    User.findAll({ where: { id: params.id } })
+    UserModel.findAll({ where: { id: params.id } })
     .then(user => {
         if (user instanceof Array) {
             const editFields: UserEdit = {
@@ -107,7 +109,7 @@ export const editUser = async( req = request, res = response ): Promise<void> =>
 export const deleteUser = async ( req = request, res = response ): Promise<void> => {
     const params: any = req.params;
 
-    User.destroy({
+    UserModel.destroy({
         where: {
             id: params.id
         }
@@ -127,7 +129,7 @@ export const loginUser = async ( req = request, res = response ): Promise<void> 
     const body: UserLogin = req.body;
 
     try {
-        const users = await User.findAll({ where: { email: body.email } });
+        const users = await UserModel.findAll({ where: { email: body.email } });
         if (users instanceof Array && users.length > 0) {
             const user: any = users[0];
             const validPassword: Boolean = await compare(body.password, user.password);
