@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import { Paths } from './../config/paths';
-import { UserRouter } from '../routes/user';
+import { UserRouter } from '../routes/UserRouter';
 
 export class Server {
     private _app: express.Application;
