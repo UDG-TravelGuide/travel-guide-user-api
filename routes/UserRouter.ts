@@ -7,7 +7,8 @@ import {
     createUser,
     editUser,
     deleteUser,
-    loginUser
+    loginUser,
+    getCurrentUser
 } from "../controllers/UserController";
 
 export const UserRouter: Router = Router();
@@ -16,10 +17,15 @@ UserRouter.get('/', [
     verifyToken
 ], getUsers);
 
+UserRouter.get('/current', [
+    verifyToken
+], getCurrentUser);
+
 UserRouter.get('/:id', [
     verifyToken
 ], getUser);
 
+// TODO: ONLY ADMINS
 UserRouter.post('/new', [
     verifyToken,
     check('email').isEmail().withMessage('El correu electrònic té un format incorrecte'),
