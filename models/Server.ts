@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 
 import { Paths } from './../config/paths';
 import { UserRouter } from '../routes/UserRouter';
+import { PublicationRouter } from '../routes/PublicationRouter';
 
 export class Server {
     private _app: express.Application;
@@ -49,5 +50,6 @@ export class Server {
         });
 
         this._app.use( Paths.UsersPath, UserRouter );
+        this._app.use( Paths.PublicationsPath, PublicationRouter );
     }
 }

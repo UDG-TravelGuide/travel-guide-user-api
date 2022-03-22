@@ -1,3 +1,4 @@
 export enum Paths {
-    UsersPath = `/users`
+    UsersPath = `/users`,
+    PublicationsPath = `/publications`
 }
