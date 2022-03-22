@@ -68,24 +68,31 @@ export const getCurrentUser = async( req = request, res = response ): Promise<vo
     }
 }
 
-// TODO: Evitar mails repetits
 export const createUser = async( req = request, res = response ): Promise<void> => {
     const body: UserCreate = req.body;
     
     try {
-        const salt = await genSalt(10);
-        const hashedPassword = await hash(body.password, salt);
+        const users = await UserModel.findAll({ where: { email: body.email } });
 
-        const newUser = {
-            userName: body.userName,
-            email: body.email,
-            password: hashedPassword,
-            birthDate: body.birthDate
-        };
-
-        const user = await UserModel.create(newUser);
-        user.save();
-        res.status(200).json( user );
+        if (users instanceof Array && users.length > 0) {
+            res.status(400).json({
+                message: `Aquest correu electrònic ja està registrat`
+            });
+        } else {
+            const salt = await genSalt(10);
+            const hashedPassword = await hash(body.password, salt);
+    
+            const newUser = {
+                userName: body.userName,
+                email: body.email,
+                password: hashedPassword,
+                birthDate: body.birthDate
+            };
+    
+            const user = await UserModel.create(newUser);
+            user.save();
+            res.status(200).json( user );
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({
