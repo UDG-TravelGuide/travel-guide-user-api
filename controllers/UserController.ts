@@ -3,6 +3,7 @@ import { hash, genSalt, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken';
 import { UserCreate, UserEdit, UserLogin } from '../interfaces/UserInterfaces';
 import { UserModel } from '../models/User';
+import { JWTUser } from '../interfaces/JWTUser';
 
 export const getUsers = async( _ = request, res = response ): Promise<void> => {
     try {
@@ -40,6 +41,33 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     }
 }
 
+export const getCurrentUser = async( req = request, res = response ): Promise<void> => {
+    let token = '';
+    const bearerHeader: string = req.body.token || req.query.token || req.headers["authorization"];
+
+    if (bearerHeader.includes('Bearer')) {
+        const bearer = bearerHeader.split(' ');
+        token = bearer[1];
+    } else {
+        token = bearerHeader;
+    }
+
+    try {
+        let splitToken = token.split('.');
+        let toPayload = splitToken[1];
+        const payload = atob(toPayload);
+        const user: JWTUser = JSON.parse(payload);
+        res.json({
+            id: user.id,
+            userName: user.name
+        });
+    } catch (error) {
+        res.status(500).send({
+            message: "S'ha produit un error al obtenir l'usuari actual"
+        });
+    }
+}
+
 // TODO: Evitar mails repetits
 export const createUser = async( req = request, res = response ): Promise<void> => {
     const body: UserCreate = req.body;
@@ -66,7 +94,6 @@ export const createUser = async( req = request, res = response ): Promise<void> 
     }
 }
 
-// TODO: Evitar editar mail
 export const editUser = async( req = request, res = response ): Promise<void> => {
     const params: any = req.params;
     const body: UserEdit = req.body;
