@@ -36,4 +36,4 @@ const getContent = () => {
     return contentModel;
 }
 
-export const ContentMoldel = getContent();
+export const ContentModel = getContent();

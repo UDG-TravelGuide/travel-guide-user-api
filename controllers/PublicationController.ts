@@ -1,8 +1,11 @@
 import { response, request } from 'express';
-import { PublicationModel } from '../models/Publication';
 import { Publication } from '../interfaces/PublicationInterfaces';
 import { Content } from '../interfaces/ContentInterface';
-import { ContentMoldel } from '../models/Content';
+import { Direction } from '../interfaces/DirectionInterface';
+import { ContentModel } from '../models/Content';
+import { PublicationModel } from '../models/Publication';
+import { DirectionModel } from '../models/Direction';
+import { ContentDirectionModel } from '../models/ContentDirection';
 
 export const getPublications = async( _ = request, res = response ): Promise<void> => {
     try {
@@ -20,7 +23,6 @@ export const getPublications = async( _ = request, res = response ): Promise<voi
     }
 }
 
-// TODO: Afegir filtres i variacions
 export const getPublication = async( req = request, res = response ): Promise<void> => {
     const params = req.params;
 
@@ -41,7 +43,6 @@ export const getPublication = async( req = request, res = response ): Promise<vo
     }
 }
 
-// TODO: Afegir validacions
 export const createPublication = async( req = request, res = response ): Promise<void> => {
     const body: Publication = req.body;
 
@@ -56,14 +57,31 @@ export const createPublication = async( req = request, res = response ): Promise
         publication.save();
 
         const contents: Content[] = body.content;
-        contents.forEach(async (content) => {
-            const createContent = await ContentMoldel.create({
+        contents.forEach(async (content: Content) => {
+            const createContent: any = await ContentModel.create({
                 type: content.type,
                 value: content.value,
                 position: content.position,
                 publicationId: publication.id
             });
             createContent.save();
+
+            if (content.type == 'route') {
+                const directions: Direction[] = content.directions;
+                directions.forEach(async (direction: Direction) => {
+                    const createDirection: any = await DirectionModel.create({
+                        coordinateOrigin: direction.coordinateOrigin,
+                        coordinateDestiny: direction.coordinateDestiny
+                    });
+                    createDirection.save();
+
+                    const createDirectionModel = await ContentDirectionModel.create({
+                        contentId: createContent.id,
+                        directionId: createDirection.id
+                    });
+                    createDirectionModel.save();
+                });  
+            }
         });
 
         res.status(200).json({
@@ -75,7 +93,7 @@ export const createPublication = async( req = request, res = response ): Promise
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            message: `Error al crear la publicacio`
+            message: `Error al crear la publicació`
         });
     }
 }
