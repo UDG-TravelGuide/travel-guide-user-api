@@ -1,11 +1,15 @@
 import { response, request } from 'express';
+// Interfaces
 import { Publication } from '../interfaces/PublicationInterfaces';
 import { Content } from '../interfaces/ContentInterface';
 import { Direction } from '../interfaces/DirectionInterface';
+// Models
 import { ContentModel } from '../models/Content';
 import { PublicationModel } from '../models/Publication';
 import { DirectionModel } from '../models/Direction';
 import { ContentDirectionModel } from '../models/ContentDirection';
+import { ImageModel } from '../models/Image';
+import { CoordinateModel } from '../models/Coordinate';
 
 export const getPublications = async( _ = request, res = response ): Promise<void> => {
     try {
@@ -69,9 +73,21 @@ export const createPublication = async( req = request, res = response ): Promise
             if (content.type == 'route') {
                 const directions: Direction[] = content.directions;
                 directions.forEach(async (direction: Direction) => {
+                    const createCoordinateOrigin: any = await CoordinateModel.create({
+                        latitude: direction.coordinateOrigin.latitude,
+                        longitude: direction.coordinateOrigin.longitude
+                    });
+                    createCoordinateOrigin.save();
+
+                    const createCoordinateDestiny: any = await CoordinateModel.create({
+                        latitude: direction.coordinateDestiny.latitude,
+                        longitude: direction.coordinateDestiny.longitude
+                    });
+                    createCoordinateDestiny.save();
+
                     const createDirection: any = await DirectionModel.create({
-                        coordinateOrigin: direction.coordinateOrigin,
-                        coordinateDestiny: direction.coordinateDestiny
+                        coordinateOrigin: createCoordinateOrigin.id,
+                        coordinateDestiny: createCoordinateDestiny.id
                     });
                     createDirection.save();
 
@@ -81,6 +97,12 @@ export const createPublication = async( req = request, res = response ): Promise
                     });
                     createDirectionModel.save();
                 });  
+            } else if (content.type == 'image') {
+                const createImage = await ImageModel.create({
+                    value: createContent.image,
+                    contentId: createContent.id
+                });
+                createImage.save();
             }
         });
 

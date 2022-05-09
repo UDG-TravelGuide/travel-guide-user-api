@@ -5,5 +5,6 @@ export interface Content {
     type: string;
     value: string;
     directions?: Direction[];
+    image?: string;
     position: number;
 }
