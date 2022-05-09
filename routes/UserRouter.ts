@@ -25,9 +25,7 @@ UserRouter.get('/:id', [
     verifyToken
 ], getUser);
 
-// TODO: ONLY ADMINS
 UserRouter.post('/new', [
-    verifyToken,
     check('email').isEmail().withMessage('El correu electrònic té un format incorrecte'),
     check('userName').not().isEmpty(),
     check('password').not().isEmpty(),
@@ -45,7 +43,3 @@ UserRouter.put('/edit/:id', [
     check('password').not().isEmpty(),
     check('birthDate').isDate({ format: 'DD-MM-YYYY' })
 ], editUser);
-
-UserRouter.delete('/delete/:id', [
-    verifyToken
-], deleteUser);
