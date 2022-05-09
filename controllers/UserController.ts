@@ -89,9 +89,18 @@ export const createUser = async( req = request, res = response ): Promise<void> 
                 birthDate: body.birthDate
             };
     
-            const user = await UserModel.create(newUser);
+            const user: any = await UserModel.create(newUser);
             user.save();
-            res.status(200).json( user );
+
+            const token = sign({
+                name: user.userName,
+                id: user.id
+            }, process.env.TOKEN_SECRET);
+
+            res.status(200).json({
+                user: user,
+                token: token
+            });
         }
     } catch (error) {
         console.error(error);
