@@ -1,9 +1,11 @@
 import { Content } from "./ContentInterface";
+import { Country } from "./CountryInterface";
 
 export interface Publication {
     id?: number;
     title: string;
     description?: string;
-    content: Content[];
+    contents: Content[];
     authorId: number;
+    countryNumericCode: string;
 }
