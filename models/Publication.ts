@@ -24,6 +24,10 @@ const getPublication = () => {
             authorId: {
                 type: INTEGER,
                 allowNull: false
+            },
+            countryAlphaCode: {
+                type: STRING,
+                allowNull: false
             }
         });
     } else {

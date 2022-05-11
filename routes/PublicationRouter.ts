@@ -3,7 +3,8 @@ import { verifyToken } from "../middlewares/auth";
 import { 
     createPublication,
     getPublication, 
-    getPublications
+    getPublications,
+    getPublicationsByCountry
 } from "../controllers/PublicationController";
 
 
@@ -16,6 +17,10 @@ PublicationRouter.get('/', [
 PublicationRouter.get('/:id', [
     verifyToken
 ], getPublication);
+
+PublicationRouter.get('/byCountry/:country', [
+    verifyToken
+], getPublicationsByCountry);
 
 PublicationRouter.post('/new', [
     verifyToken
