@@ -10,6 +10,7 @@ import { DirectionModel } from '../models/Direction';
 import { ContentDirectionModel } from '../models/ContentDirection';
 import { ImageModel } from '../models/Image';
 import { CoordinateModel } from '../models/Coordinate';
+import { FavoritePublicationUserModel } from '../models/FavoritePublicationUser';
 
 export const getPublications = async( _ = request, res = response ): Promise<void> => {
     try {
@@ -67,8 +68,31 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
     }
 }
 
-export const getFavoritePublicationsOfUser = async(): Promise<void> => {
+export const getFavoritePublicationsOfUser = async( req = request, res = response ): Promise<void> => {
+    const params = req.params;
 
+    try {
+        const favorites: any = await FavoritePublicationUserModel.findAll({ where: { userId: params.userId }  });
+        let publications: Publication[] = [];
+
+        if (favorites instanceof Array && favorites.length > 0) {
+            favorites.forEach(async (favorite) => {
+                const publication: any = await PublicationModel.findOne({ where: { id: favorite.publicationId } });
+                if (publication instanceof PublicationModel && publication != null) {
+                    const fullPublication: Publication = await getAllInfoOfPublication(publication);
+                    publications.push(fullPublication);
+                }
+            });
+
+            res.status(200).json( publications );
+        } else {
+            res.status(200).json( [] );
+        }
+    } catch (error) {
+        res.status(400).json({
+            message: `No s'ha trobat el usuari amb id: ${ params.userId }`
+        });
+    }
 }
 
 export const getPublication = async( req = request, res = response ): Promise<void> => {
