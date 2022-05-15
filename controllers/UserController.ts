@@ -21,6 +21,8 @@ export const getUsers = async( _ = request, res = response ): Promise<void> => {
     }
 }
 
+// TODO: Refresh token
+
 export const getUser = async( req = request, res = response ): Promise<void> => {
     const params = req.params;
     

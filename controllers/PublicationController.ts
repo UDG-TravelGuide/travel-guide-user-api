@@ -47,8 +47,24 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
     }
 }
 
-export const getPublicationsByAuthor = async(): Promise<void> => {
+export const getPublicationsByAuthor = async( req = request, res = response ): Promise<void> => {
+    const params = req.params;
 
+    try {
+        const publications: any = await PublicationModel.findAll({ where: { authorId: params.authorId } });
+
+        if (publications instanceof Array && publications.length > 0) {
+            const allPublications: Publication[] = getFullInfoOfPublications(publications);
+            res.json( allPublications );
+        } else {
+            res.status(200).json( [] );
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: `Error al obteniur les publicacions amb l'autor amb id: ${ params.authorId }`
+        });
+    }
 }
 
 export const getFavoritePublicationsOfUser = async(): Promise<void> => {

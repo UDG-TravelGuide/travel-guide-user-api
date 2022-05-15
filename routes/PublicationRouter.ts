@@ -4,7 +4,8 @@ import {
     createPublication,
     getPublication, 
     getPublications,
-    getPublicationsByCountry
+    getPublicationsByCountry,
+    getPublicationsByAuthor
 } from "../controllers/PublicationController";
 
 
@@ -21,6 +22,10 @@ PublicationRouter.get('/:id', [
 PublicationRouter.get('/byCountry/:country', [
     verifyToken
 ], getPublicationsByCountry);
+
+PublicationRouter.get('/byAuthor/:author', [
+    verifyToken
+], getPublicationsByAuthor);
 
 PublicationRouter.post('/new', [
     verifyToken
