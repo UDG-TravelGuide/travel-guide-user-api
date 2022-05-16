@@ -3,6 +3,7 @@ import { response, request } from 'express';
 import { Publication } from '../interfaces/PublicationInterfaces';
 import { Content } from '../interfaces/ContentInterface';
 import { Direction } from '../interfaces/DirectionInterface';
+import { JWTUser } from '../interfaces/JWTUser';
 // Models
 import { ContentModel } from '../models/Content';
 import { PublicationModel } from '../models/Publication';
@@ -10,7 +11,7 @@ import { DirectionModel } from '../models/Direction';
 import { ContentDirectionModel } from '../models/ContentDirection';
 import { ImageModel } from '../models/Image';
 import { CoordinateModel } from '../models/Coordinate';
-import { FavoritePublicationUserModel } from '../models/FavoritePublicationUser';
+import { getCurrentUserByToken } from './UserController';
 
 export const getPublications = async( _ = request, res = response ): Promise<void> => {
     try {
@@ -64,33 +65,6 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
         console.error(error);
         res.status(500).json({
             message: `Error al obteniur les publicacions amb l'autor amb id: ${ params.authorId }`
-        });
-    }
-}
-
-export const getFavoritePublicationsOfUser = async( req = request, res = response ): Promise<void> => {
-    const params = req.params;
-
-    try {
-        const favorites: any = await FavoritePublicationUserModel.findAll({ where: { userId: params.userId }  });
-        let publications: Publication[] = [];
-
-        if (favorites instanceof Array && favorites.length > 0) {
-            favorites.forEach(async (favorite) => {
-                const publication: any = await PublicationModel.findOne({ where: { id: favorite.publicationId } });
-                if (publication instanceof PublicationModel && publication != null) {
-                    const fullPublication: Publication = await getAllInfoOfPublication(publication);
-                    publications.push(fullPublication);
-                }
-            });
-
-            res.status(200).json( publications );
-        } else {
-            res.status(200).json( [] );
-        }
-    } catch (error) {
-        res.status(400).json({
-            message: `No s'ha trobat el usuari amb id: ${ params.userId }`
         });
     }
 }
@@ -189,6 +163,35 @@ export const createPublication = async( req = request, res = response ): Promise
     }
 }
 
+export const deletePublication = async( req = request, res = response ): Promise<void> => {
+    const params = req.params;
+
+    try {
+        const user: JWTUser = await getCurrentUserByToken();
+
+        PublicationModel.destroy({
+            where: {
+                id: params.publicationId,
+                authorId: user.id,
+            }
+        }).then(_ => {
+            res.status(200).json({
+                message: `S'ha eliminat correctament la publicació`
+            });
+        }).catch(error => {
+            console.error(error);
+            res.status(500).json({
+                message: `Error al eliminar la publicació ${ params.publicationId }, no pertany al usuari o no existeix aquesta publicació`
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: `Ha sorgit un error al intentar esborrar la publicació amb la id: ${ params.publicationId }`
+        });
+    }
+}
+
 const getFullInfoOfPublications = (publications: any): Publication[] => {
     let fullPublications: Publication[] = [];
 
@@ -200,7 +203,7 @@ const getFullInfoOfPublications = (publications: any): Publication[] => {
     return fullPublications;
 }
 
-const getAllInfoOfPublication = async(publication: any): Promise<Publication> => {
+export const getAllInfoOfPublication = async(publication: any): Promise<Publication> => {
     const contents = await ContentModel.findAll({ where: { publicationId: publication.id } });
     let fullContents: Content[] = [];
 

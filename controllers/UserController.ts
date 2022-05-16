@@ -43,7 +43,7 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     }
 }
 
-export const getCurrentUser = async( req = request, res = response ): Promise<void> => {
+export const getCurrentUserByToken = async( req = request, res = response ): Promise<JWTUser> => {
     let token = '';
     const bearerHeader: string = req.body.token || req.query.token || req.headers["authorization"];
 
@@ -59,6 +59,15 @@ export const getCurrentUser = async( req = request, res = response ): Promise<vo
         let toPayload = splitToken[1];
         const payload = atob(toPayload);
         const user: JWTUser = JSON.parse(payload);
+        return user;
+    } catch (error) {
+        return error;
+    }
+}
+
+export const getCurrentUser = async( req = request, res = response ): Promise<void> => {
+    try {
+        const user: JWTUser = await getCurrentUserByToken();
         res.json({
             id: user.id,
             userName: user.name

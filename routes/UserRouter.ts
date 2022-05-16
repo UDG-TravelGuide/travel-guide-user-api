@@ -6,7 +6,6 @@ import {
     getUser,
     createUser,
     editUser,
-    deleteUser,
     loginUser,
     getCurrentUser
 } from "../controllers/UserController";

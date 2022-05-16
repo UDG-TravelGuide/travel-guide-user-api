@@ -1,5 +1,7 @@
 import { Sequelize, STRING, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
+// Models
+import { ContentModel } from './Content';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -19,9 +21,14 @@ const getImage = () => {
             },
             contentId: {
                 type: INTEGER,
-                allowNull: false
+                allowNull: false,
+                references: {
+                    model: ContentModel,
+                    key: 'id'
+                }
             }
         });
+        imageModel.belongsTo(ContentModel);
     } else {
         imageModel = null;
     }

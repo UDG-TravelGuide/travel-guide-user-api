@@ -6,7 +6,7 @@ import {
     getPublications,
     getPublicationsByCountry,
     getPublicationsByAuthor,
-    getFavoritePublicationsOfUser
+    deletePublication
 } from "../controllers/PublicationController";
 
 
@@ -28,10 +28,10 @@ PublicationRouter.get('/byAuthor/:authorId', [
     verifyToken
 ], getPublicationsByAuthor);
 
-PublicationRouter.get('/favorites/:userId', [
-    verifyToken
-], getFavoritePublicationsOfUser);
-
 PublicationRouter.post('/new', [
     verifyToken
 ], createPublication);
+
+PublicationRouter.delete('/delete/:publicationId', [
+    verifyToken
+], deletePublication);

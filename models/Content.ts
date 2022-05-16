@@ -1,5 +1,9 @@
 import { Sequelize, STRING, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
+// Models
+import { PublicationModel } from './Publication';
+import { DirectionModel } from './Direction';
+import { ContentDirectionModel } from './ContentDirection';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -29,6 +33,11 @@ const getContent = () => {
                 type: INTEGER,
                 allowNull: false
             }
+        });
+        contentModel.belongsTo(PublicationModel);
+        contentModel.belongsToMany(DirectionModel, { 
+            through: ContentDirectionModel,
+            onDelete: 'CASCADE'
         });
     } else {
         contentModel = null;

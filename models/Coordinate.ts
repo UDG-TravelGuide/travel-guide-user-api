@@ -1,5 +1,7 @@
 import { Sequelize, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
+// Model
+import { DirectionModel } from './Direction';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -21,6 +23,9 @@ const getCoordinate = () => {
                 type: INTEGER,
                 allowNull: false
             }
+        });
+        coordinateModel.belongsTo(DirectionModel, {
+            onDelete: 'CASCADE'
         });
     } else {
         coordinateModel = null;

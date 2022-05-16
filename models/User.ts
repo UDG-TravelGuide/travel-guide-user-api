@@ -1,5 +1,9 @@
 import { Sequelize, STRING, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
+// Models
+import { PublicationModel } from './Publication';
+import { FavoritePublicationUserModel } from './FavoritePublicationUser';
+
 
 const sequelize: Sequelize = getSequelize();
 
@@ -39,6 +43,8 @@ const getUser = () => {
                 defaultValue: 0
             }
         });
+        userModel.hasMany(PublicationModel);
+        userModel.belongsToMany(PublicationModel, { through: FavoritePublicationUserModel });
     } else {
         userModel = null;
     }

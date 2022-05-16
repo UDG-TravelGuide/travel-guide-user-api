@@ -1,5 +1,8 @@
 import { Sequelize, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
+// Models
+import { ContentModel } from './Content';
+import { DirectionModel } from './Direction';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -15,11 +18,19 @@ const getContentDirection = () => {
             },
             contentId: {
                 type: INTEGER,
-                allowNull: false
+                allowNull: false,
+                references: {
+                    model: ContentModel,
+                    key: 'id'
+                }
             },
             directionId: {
                 type: INTEGER,
-                allowNull: false
+                allowNull: false,
+                references: {
+                    model: DirectionModel,
+                    key: 'id'
+                }
             }
         });
     } else {

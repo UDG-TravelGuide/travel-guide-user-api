@@ -1,5 +1,9 @@
 import { Sequelize, STRING, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
+// Models
+import { ContentModel } from './Content';
+import { UserModel } from './User';
+import { FavoritePublicationUserModel } from './FavoritePublicationUser';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -23,13 +27,22 @@ const getPublication = () => {
             },
             authorId: {
                 type: INTEGER,
-                allowNull: false
+                allowNull: false,
+                references: {
+                    model: UserModel,
+                    key: 'id'
+                }
             },
             countryAlphaCode: {
                 type: STRING,
                 allowNull: false
             }
         });
+        publicationModel.hasMany(ContentModel, {
+            onDelete: 'CASCADE'
+        });
+        publicationModel.belongsTo(UserModel);
+        publicationModel.belongsToMany(UserModel, { through: FavoritePublicationUserModel })
     } else {
         publicationModel = null;
     }
