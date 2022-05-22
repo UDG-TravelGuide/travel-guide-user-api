@@ -2,10 +2,19 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
+// ROUTES
 import { Paths } from './../config/paths';
 import { UserRouter } from '../routes/UserRouter';
 import { PublicationRouter } from '../routes/PublicationRouter';
 import { FavoritePublicationRouter } from '../routes/FavoritePublicationRouter';
+// MODELS
+import { ImageModel } from './Image';
+import { FavoritePublicationUserModel } from './FavoritePublicationUser';
+import { UserModel } from './User';
+import { PublicationModel } from './Publication';
+import { ContentDirectionModel } from './ContentDirection';
+import { DirectionModel } from './Direction';
+import { ContentModel } from './Content';
 
 export class Server {
     private _app: express.Application;
@@ -24,6 +33,9 @@ export class Server {
 
         // Configuració de les rutes
         this._initRoutes();
+
+        // Init DB relationships
+        this._initDbRelations();
     }
 
     public listen(): void {
@@ -53,5 +65,17 @@ export class Server {
         this._app.use( Paths.UsersPath, UserRouter );
         this._app.use( Paths.PublicationsPath, PublicationRouter );
         this._app.use( Paths.FavoritesPath, FavoritePublicationRouter );
+    }
+
+    private _initDbRelations(): void {
+        PublicationModel.hasMany(ContentModel, { onDelete: 'CASCADE' })
+        ContentModel.belongsTo(PublicationModel, { foreignKey: 'publicationId' });
+        
+        PublicationModel.belongsTo(UserModel, { foreignKey: 'authorId', onDelete: 'CASCADE' });
+        ImageModel.belongsTo(ContentModel, { foreignKey: 'contentId', onDelete: 'CASCADE' });
+        ContentModel.belongsToMany(DirectionModel, { through: ContentDirectionModel, onDelete: 'CASCADE' });
+        DirectionModel.belongsToMany(ContentModel, { through: ContentDirectionModel, onDelete: 'CASCADE' });
+        PublicationModel.belongsToMany(UserModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE' });
+        UserModel.belongsToMany(PublicationModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE' });
     }
 }

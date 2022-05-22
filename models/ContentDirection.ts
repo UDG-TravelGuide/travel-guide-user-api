@@ -1,8 +1,7 @@
-import { Sequelize, INTEGER, Model, ModelCtor } from 'sequelize';
-import { getSequelize } from '../config/dbConfig';
-// Models
 import { ContentModel } from './Content';
 import { DirectionModel } from './Direction';
+import { Sequelize, INTEGER, Model, ModelCtor } from 'sequelize';
+import { getSequelize } from '../config/dbConfig';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -16,19 +15,19 @@ const getContentDirection = () => {
                 autoIncrement: true,
                 allowNull: false
             },
-            contentId: {
-                type: INTEGER,
-                allowNull: false,
-                references: {
-                    model: ContentModel,
-                    key: 'id'
-                }
-            },
             directionId: {
                 type: INTEGER,
                 allowNull: false,
                 references: {
                     model: DirectionModel,
+                    key: 'id'
+                }
+            },
+            contentId: {
+                type: INTEGER,
+                allowNull: false,
+                references: {
+                    model: ContentModel,
                     key: 'id'
                 }
             }

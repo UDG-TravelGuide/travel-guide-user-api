@@ -1,11 +1,10 @@
-import { Coordinate } from "./CoordinateInterface";
-
 export interface Country {
     name: string;
     alphaCode: string;
     region: string;
     subregion: string;
-    coordinates: Coordinate;
+    latitude: number;
+    longitude: number;
     spanishName: string;
     flagURL: string;
 }

@@ -43,9 +43,9 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     }
 }
 
-export const getCurrentUserByToken = async( req = request, res = response ): Promise<JWTUser> => {
+export const getCurrentUserByToken = async( req = request, _ = response ): Promise<JWTUser> => {
     let token = '';
-    const bearerHeader: string = req.body.token || req.query.token || req.headers["authorization"];
+    const bearerHeader: string = req.body?.token || req.query?.token || req.headers["authorization"];
 
     if (bearerHeader.includes('Bearer')) {
         const bearer = bearerHeader.split(' ');
@@ -126,11 +126,14 @@ export const editUser = async( req = request, res = response ): Promise<void> =>
     const body: UserEdit = req.body;
 
     UserModel.findAll({ where: { id: params.id } })
-    .then(user => {
+    .then(async (user) => {
         if (user instanceof Array) {
+            const salt = await genSalt(10);
+            const hashedPassword = await hash(body.password, salt);
+
             const editFields: UserEdit = {
                 userName: body.userName,
-                password: body.password,
+                password: hashedPassword,
                 birthDate: body.birthDate,
                 profilePhoto: body.profilePhoto
             };

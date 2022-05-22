@@ -7,5 +7,5 @@ export interface Publication {
     description?: string;
     contents: Content[];
     authorId: number;
-    countryNumericCode: string;
+    countryAlphaCode: string;
 }

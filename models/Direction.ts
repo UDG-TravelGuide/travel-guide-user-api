@@ -1,8 +1,5 @@
 import { Sequelize, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
-import { ContentDirectionModel } from './ContentDirection';
-// Model
-import { CoordinateModel } from './Coordinate';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -16,29 +13,22 @@ const getDirection = () => {
                 autoIncrement: true,
                 allowNull: false
             },
-            coordinateOrigin: {
+            latitudeOrigin: {
                 type: INTEGER,
-                allowNull: false,
-                references: {
-                    model: CoordinateModel,
-                    key: 'id'
-                }
+                allowNull: false
             },
-            coordinateDestiny: {
+            longitudeOrigin: {
                 type: INTEGER,
-                allowNull: false,
-                references: {
-                    model: CoordinateModel,
-                    key: 'id'
-                }
+                allowNull: false
+            },
+            latitudeDestiny: {
+                type: INTEGER,
+                allowNull: false
+            },
+            longitudeDestiny: {
+                type: INTEGER,
+                allowNull: false
             }
-        });
-        directionModel.hasMany(CoordinateModel, {
-            onDelete: 'CASCADE'
-        });
-        directionModel.belongsToMany(CoordinateModel, { 
-            through: ContentDirectionModel,
-            onDelete: 'CASCADE'
         });
     } else {
         directionModel = null;

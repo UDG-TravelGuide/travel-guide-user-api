@@ -1,8 +1,7 @@
+import { UserModel } from './User';
+import { PublicationModel } from './Publication';
 import { Sequelize, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
-// Models
-import { PublicationModel } from './Publication';
-import { UserModel } from './User';
 
 const sequelize: Sequelize = getSequelize();
 
@@ -18,7 +17,6 @@ const getFavoritePublicationUser = () => {
             },
             publicationId: {
                 type: INTEGER,
-                allowNull: false,
                 references: {
                     model: PublicationModel,
                     key: 'id'
@@ -26,7 +24,6 @@ const getFavoritePublicationUser = () => {
             },
             userId: {
                 type: INTEGER,
-                allowNull: false,
                 references: {
                     model: UserModel,
                     key: 'id'

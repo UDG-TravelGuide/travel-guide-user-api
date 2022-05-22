@@ -1,6 +1,7 @@
-import { Coordinate } from "./CoordinateInterface";
-
 export interface Direction {
-    coordinateOrigin: Coordinate;
-    coordinateDestiny: Coordinate;
+    id?: number;
+    latitudeOrigin: number;
+    longitudeOrigin: number;
+    latitudeDestiny: number;
+    longitudeDestiny: number;
 }

@@ -10,7 +10,6 @@ import { PublicationModel } from '../models/Publication';
 import { DirectionModel } from '../models/Direction';
 import { ContentDirectionModel } from '../models/ContentDirection';
 import { ImageModel } from '../models/Image';
-import { CoordinateModel } from '../models/Coordinate';
 import { getCurrentUserByToken } from './UserController';
 
 export const getPublications = async( _ = request, res = response ): Promise<void> => {
@@ -97,11 +96,12 @@ export const createPublication = async( req = request, res = response ): Promise
         const newPublication = {
             title: body.title,
             description: (body.description != null && body.description != undefined) ? body.description : '',
-            authorId: body.authorId
+            authorId: body.authorId,
+            countryAlphaCode: body.countryAlphaCode
         };
 
         const publication: any = await PublicationModel.create(newPublication);
-        publication.save();
+        await publication.save();
 
         const contents: Content[] = body.contents;
         contents.forEach(async (content: Content) => {
@@ -111,41 +111,32 @@ export const createPublication = async( req = request, res = response ): Promise
                 position: content.position,
                 publicationId: publication.id
             });
-            createContent.save();
+            await createContent.save();
 
             if (content.type == 'route') {
                 const directions: Direction[] = content.directions;
                 directions.forEach(async (direction: Direction) => {
-                    const createCoordinateOrigin: any = await CoordinateModel.create({
-                        latitude: direction.coordinateOrigin.latitude,
-                        longitude: direction.coordinateOrigin.longitude
-                    });
-                    createCoordinateOrigin.save();
-
-                    const createCoordinateDestiny: any = await CoordinateModel.create({
-                        latitude: direction.coordinateDestiny.latitude,
-                        longitude: direction.coordinateDestiny.longitude
-                    });
-                    createCoordinateDestiny.save();
 
                     const createDirection: any = await DirectionModel.create({
-                        coordinateOrigin: createCoordinateOrigin.id,
-                        coordinateDestiny: createCoordinateDestiny.id
+                        latitudeOrigin: direction.latitudeOrigin,
+                        longitudeOrigin: direction.longitudeOrigin,
+                        latitudeDestiny: direction.latitudeDestiny,
+                        longitudeDestiny: direction.longitudeDestiny
                     });
-                    createDirection.save();
+                    await createDirection.save();
 
                     const createDirectionModel = await ContentDirectionModel.create({
                         contentId: createContent.id,
                         directionId: createDirection.id
                     });
-                    createDirectionModel.save();
+                    await createDirectionModel.save();
                 });  
             } else if (content.type == 'image') {
                 const createImage = await ImageModel.create({
                     value: createContent.image,
                     contentId: createContent.id
                 });
-                createImage.save();
+                await createImage.save();
             }
         });
 
@@ -153,7 +144,7 @@ export const createPublication = async( req = request, res = response ): Promise
             title: newPublication.title,
             description: newPublication.description,
             authorId: newPublication.authorId,
-            content: contents
+            contents: contents
         });
     } catch (error) {
         console.error(error);
@@ -167,7 +158,7 @@ export const deletePublication = async( req = request, res = response ): Promise
     const params = req.params;
 
     try {
-        const user: JWTUser = await getCurrentUserByToken();
+        const user: JWTUser = await getCurrentUserByToken(req, res);
 
         PublicationModel.destroy({
             where: {
@@ -234,24 +225,13 @@ export const getAllInfoOfPublication = async(publication: any): Promise<Publicat
                     contentDirections.forEach(async (contentDirection: any) => {
                         const direction: any = await DirectionModel.findOne({ where: { id: contentDirection.directionId } });
                         if (direction instanceof DirectionModel && direction != null) {
-                            const coordinateOrign: any = await CoordinateModel.findOne({ where: { id: direction.coordinateOrigin } });
-                            const coordinateDestiny: any = await CoordinateModel.findOne({ where: { id: direction.coordinateDestiny } });
-
-                            if (coordinateOrign instanceof CoordinateModel && coordinateOrign != null &&
-                                coordinateDestiny instanceof CoordinateModel && coordinateDestiny != null) {
-                                currentContent.directions.push({
-                                    coordinateOrigin: {
-                                        id: coordinateOrign.id,
-                                        latitude: coordinateOrign.latitude,
-                                        longitude: coordinateOrign.longitude
-                                    },
-                                    coordinateDestiny: {
-                                        id: coordinateDestiny.id,
-                                        latitude: coordinateDestiny.latitude,
-                                        longitude: coordinateDestiny.longitude
-                                    }
-                                });
-                            }
+                            currentContent.directions.push({
+                                id: direction.id,
+                                latitudeOrigin: direction.latitudeOrigin,
+                                longitudeOrigin: direction.longitudeOrigin,
+                                latitudeDestiny: direction.latitudeDestiny,
+                                longitudeDestiny: direction.longitudeDestiny
+                            });
                         }
                     });
                 }
@@ -264,7 +244,7 @@ export const getAllInfoOfPublication = async(publication: any): Promise<Publicat
         title: publication.title,
         description: publication.description,
         authorId: publication.authorId,
-        countryNumericCode: publication.countryNumericCode,
+        countryAlphaCode: publication.countryAlphaCode,
         contents: fullContents,
     };
 

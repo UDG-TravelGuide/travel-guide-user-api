@@ -2,7 +2,7 @@ import { response, request } from 'express';
 import { verify } from 'jsonwebtoken';
 
 export const verifyToken = ( req = request, res = response, next ) => {
-    const bearerHeader: string = req.body.token || req.query.token || req.headers["authorization"];
+    const bearerHeader: string = req.body?.token || req.query?.token || req.headers["authorization"];
 
 
     if (!bearerHeader) {

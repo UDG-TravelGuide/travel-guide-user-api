@@ -28,7 +28,6 @@ const getImage = () => {
                 }
             }
         });
-        imageModel.belongsTo(ContentModel);
     } else {
         imageModel = null;
     }
