@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { check } from 'express-validator';
 import { verifyToken } from '../middlewares/auth';
+import { authorizeAdmin } from "../middlewares/admin";
 import { 
     getUsers, 
     getUser,
@@ -13,7 +14,7 @@ import {
 export const UserRouter: Router = Router();
 
 UserRouter.get('/', [
-    verifyToken
+    authorizeAdmin
 ], getUsers);
 
 UserRouter.get('/current', [

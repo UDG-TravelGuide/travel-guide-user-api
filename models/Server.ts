@@ -12,7 +12,6 @@ import { ImageModel } from './Image';
 import { FavoritePublicationUserModel } from './FavoritePublicationUser';
 import { UserModel } from './User';
 import { PublicationModel } from './Publication';
-import { ContentDirectionModel } from './ContentDirection';
 import { DirectionModel } from './Direction';
 import { ContentModel } from './Content';
 
@@ -68,14 +67,11 @@ export class Server {
     }
 
     private _initDbRelations(): void {
-        PublicationModel.hasMany(ContentModel, { onDelete: 'CASCADE' })
-        ContentModel.belongsTo(PublicationModel, { foreignKey: 'publicationId' });
-        
-        PublicationModel.belongsTo(UserModel, { foreignKey: 'authorId', onDelete: 'CASCADE' });
-        ImageModel.belongsTo(ContentModel, { foreignKey: 'contentId', onDelete: 'CASCADE' });
-        ContentModel.belongsToMany(DirectionModel, { through: ContentDirectionModel, onDelete: 'CASCADE' });
-        DirectionModel.belongsToMany(ContentModel, { through: ContentDirectionModel, onDelete: 'CASCADE' });
-        PublicationModel.belongsToMany(UserModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE' });
-        UserModel.belongsToMany(PublicationModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE' });
+        ContentModel.belongsTo(PublicationModel, { foreignKey: 'publicationId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        PublicationModel.belongsTo(UserModel, { foreignKey: 'authorId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        DirectionModel.belongsTo(ContentModel, { foreignKey: 'contentId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        ImageModel.belongsTo(ContentModel, { foreignKey: 'contentId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        PublicationModel.belongsToMany(UserModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        UserModel.belongsToMany(PublicationModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
     }
 }

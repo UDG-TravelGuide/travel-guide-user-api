@@ -10,22 +10,22 @@ import { getCurrentUserByToken } from './UserController';
 import { getAllInfoOfPublication } from './PublicationController';
 import { JWTUser } from '../interfaces/JWTUser';
 
-export const getFavoritePublicationsOfUser = async( _ = request, res = response ): Promise<void> => {
+export const getFavoritePublicationsOfUser = async( req = request, res = response ): Promise<void> => {
     try {
-        const user: JWTUser = await getCurrentUserByToken();
+        const user: JWTUser = await getCurrentUserByToken(req, res);
 
         const favorites: any = await FavoritePublicationUserModel.findAll({ where: { userId: user.id }  });
         let publications: Publication[] = [];
 
         if (favorites instanceof Array && favorites.length > 0) {
-            favorites.forEach(async (favorite) => {
+            for (let i: number = 0; i < favorites.length; i++) {
+                const favorite: any = favorites[i];
                 const publication: any = await PublicationModel.findOne({ where: { id: favorite.publicationId } });
                 if (publication instanceof PublicationModel && publication != null) {
                     const fullPublication: Publication = await getAllInfoOfPublication(publication);
                     publications.push(fullPublication);
                 }
-            });
-
+            }
             res.status(200).json( publications );
         } else {
             res.status(200).json( [] );
@@ -41,7 +41,7 @@ export const addFavoritePublication = async( req = request, res = response ): Pr
     const params = req.params;
 
     try {
-        const user: JWTUser = await getCurrentUserByToken();
+        const user: JWTUser = await getCurrentUserByToken(req, res);
 
         const newFavorite: any = {
             publicationId: params.publicationId,
@@ -62,7 +62,7 @@ export const removeFavoritePublication = async( req = request, res = response ):
     const params = req.params;
 
     try {
-        const user: JWTUser = await getCurrentUserByToken();
+        const user: JWTUser = await getCurrentUserByToken(req, res);
 
         FavoritePublicationUserModel.destroy({
             where: {

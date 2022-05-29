@@ -37,6 +37,10 @@ const getUser = () => {
                 type: INTEGER,
                 allowNull: false,
                 defaultValue: 0
+            },
+            role: {
+                type: STRING,
+                allowNull: false
             }
         });
     } else {

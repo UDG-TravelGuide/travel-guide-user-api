@@ -1,9 +1,9 @@
 import { response, request } from 'express';
-import { JwtPayload, decode, verify, sign } from 'jsonwebtoken';
+import { verify } from 'jsonwebtoken';
 
-export const verifyToken = ( req = request, res = response, next ) => {
+export const authorizeAdmin = ( req = request, res = response, next ) => {
     const bearerHeader: string = req.body?.token || req.query?.token || req.headers["authorization"];
-
+    const mainRole = 'ADMIN';
 
     if (!bearerHeader) {
         return res.status(401).send("És necessari loguejar-se per realitzar aquestes operacions");
@@ -19,18 +19,17 @@ export const verifyToken = ( req = request, res = response, next ) => {
     }
     
     try {
-        const decoded: string | JwtPayload = decode(token);
-        if ((typeof decoded !== "string") && Date.now() >= decoded.exp * 1000) {
-            return res.status(401).send("El token ha caducat");
-        }
-
         const verified = verify(token, process.env.TOKEN_SECRET);
         if (!verified) {
             return res.status(401).send("Aquest token és invalid");
         }
 
-        const signed = sign(token, process.env.TOKEN_SECRET);
-        if (!signed) {
+        if (typeof verified !== 'string') {
+            const user = verified;
+            if (user.role != mainRole) {
+                return res.status(401).send("Aquest usuari no te els permisos per realitzar aquesta acció");
+            }
+        } else {
             return res.status(401).send("Aquest token és invalid");
         }
     } catch (err) {

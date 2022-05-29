@@ -8,7 +8,6 @@ import { JWTUser } from '../interfaces/JWTUser';
 import { ContentModel } from '../models/Content';
 import { PublicationModel } from '../models/Publication';
 import { DirectionModel } from '../models/Direction';
-import { ContentDirectionModel } from '../models/ContentDirection';
 import { ImageModel } from '../models/Image';
 import { getCurrentUserByToken } from './UserController';
 
@@ -16,7 +15,7 @@ export const getPublications = async( _ = request, res = response ): Promise<voi
     try {
         const publications = await PublicationModel.findAll();
         if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = getFullInfoOfPublications(publications);
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
             res.json( allPublications );
         } else {
             res.json( [] );
@@ -35,7 +34,7 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
     try {
         const publications: any = await PublicationModel.findAll({ where: { countryAlphaCode: params.country } });
         if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = getFullInfoOfPublications(publications);
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
             res.json( allPublications );
         } else {
             res.status(200).json( [] );
@@ -55,7 +54,7 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
         const publications: any = await PublicationModel.findAll({ where: { authorId: params.authorId } });
 
         if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = getFullInfoOfPublications(publications);
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
             res.json( allPublications );
         } else {
             res.status(200).json( [] );
@@ -93,10 +92,12 @@ export const createPublication = async( req = request, res = response ): Promise
     const body: Publication = req.body;
 
     try {
+        const user: JWTUser = await getCurrentUserByToken(req, res);
+
         const newPublication = {
             title: body.title,
             description: (body.description != null && body.description != undefined) ? body.description : '',
-            authorId: body.authorId,
+            authorId: user.id,
             countryAlphaCode: body.countryAlphaCode
         };
 
@@ -104,7 +105,8 @@ export const createPublication = async( req = request, res = response ): Promise
         await publication.save();
 
         const contents: Content[] = body.contents;
-        contents.forEach(async (content: Content) => {
+        for (let i: number = 0; i < contents.length; i++) {
+            const content: Content = contents[i];
             const createContent: any = await ContentModel.create({
                 type: content.type,
                 value: content.value,
@@ -115,22 +117,17 @@ export const createPublication = async( req = request, res = response ): Promise
 
             if (content.type == 'route') {
                 const directions: Direction[] = content.directions;
-                directions.forEach(async (direction: Direction) => {
-
+                for (let j: number = 0; j < directions.length; j++) {
+                    const direction: Direction = directions[j];
                     const createDirection: any = await DirectionModel.create({
                         latitudeOrigin: direction.latitudeOrigin,
                         longitudeOrigin: direction.longitudeOrigin,
                         latitudeDestiny: direction.latitudeDestiny,
-                        longitudeDestiny: direction.longitudeDestiny
+                        longitudeDestiny: direction.longitudeDestiny,
+                        contentId: createContent.id
                     });
                     await createDirection.save();
-
-                    const createDirectionModel = await ContentDirectionModel.create({
-                        contentId: createContent.id,
-                        directionId: createDirection.id
-                    });
-                    await createDirectionModel.save();
-                });  
+                }
             } else if (content.type == 'image') {
                 const createImage = await ImageModel.create({
                     value: createContent.image,
@@ -138,7 +135,7 @@ export const createPublication = async( req = request, res = response ): Promise
                 });
                 await createImage.save();
             }
-        });
+        }
 
         res.status(200).json({
             title: newPublication.title,
@@ -183,13 +180,14 @@ export const deletePublication = async( req = request, res = response ): Promise
     }
 }
 
-const getFullInfoOfPublications = (publications: any): Publication[] => {
+const getFullInfoOfPublications = async (publications: any): Promise<Publication[]> => {
     let fullPublications: Publication[] = [];
 
-    publications.forEach(async (publication: any) => {
+    for (let i: number = 0; i < publications.length; i++) {
+        const publication: any = publications[i];
         const fullPublication: Publication = await getAllInfoOfPublication(publication);
         fullPublications.push(fullPublication);
-    });
+    }
 
     return fullPublications;
 }
@@ -219,21 +217,9 @@ export const getAllInfoOfPublication = async(publication: any): Promise<Publicat
                     };
                 }
             } else if (currentContent.type == 'route') {
-                currentContent.directions = [];
-                const contentDirections: any = await ContentDirectionModel.findAll({ where: { contentId: currentContent.id } });
-                if (contentDirections instanceof Array && contentDirections.length > 0) {
-                    contentDirections.forEach(async (contentDirection: any) => {
-                        const direction: any = await DirectionModel.findOne({ where: { id: contentDirection.directionId } });
-                        if (direction instanceof DirectionModel && direction != null) {
-                            currentContent.directions.push({
-                                id: direction.id,
-                                latitudeOrigin: direction.latitudeOrigin,
-                                longitudeOrigin: direction.longitudeOrigin,
-                                latitudeDestiny: direction.latitudeDestiny,
-                                longitudeDestiny: direction.longitudeDestiny
-                            });
-                        }
-                    });
+                const directions: any = await DirectionModel.findAll({ where: { contentId: currentContent.id } });
+                if (directions instanceof Array && directions.length > 0) {
+                    currentContent.directions = directions;
                 }
             }
         });

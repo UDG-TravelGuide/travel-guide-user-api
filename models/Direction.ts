@@ -28,6 +28,10 @@ const getDirection = () => {
             longitudeDestiny: {
                 type: INTEGER,
                 allowNull: false
+            },
+            contentId: {
+                type: INTEGER,
+                allowNull: false
             }
         });
     } else {

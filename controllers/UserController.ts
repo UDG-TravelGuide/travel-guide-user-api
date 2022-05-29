@@ -21,8 +21,6 @@ export const getUsers = async( _ = request, res = response ): Promise<void> => {
     }
 }
 
-// TODO: Refresh token
-
 export const getUser = async( req = request, res = response ): Promise<void> => {
     const params = req.params;
     
@@ -67,7 +65,7 @@ export const getCurrentUserByToken = async( req = request, _ = response ): Promi
 
 export const getCurrentUser = async( req = request, res = response ): Promise<void> => {
     try {
-        const user: JWTUser = await getCurrentUserByToken();
+        const user: JWTUser = await getCurrentUserByToken(req, res);
         res.json({
             id: user.id,
             userName: user.name
@@ -193,7 +191,8 @@ export const loginUser = async ( req = request, res = response ): Promise<void> 
             if (validPassword) {
                 const token = sign({
                     name: user.userName,
-                    id: user.id
+                    id: user.id,
+                    role: user.role
                 }, process.env.TOKEN_SECRET);
                 res.status(200).json( { token } );
             } else {
@@ -212,4 +211,8 @@ export const loginUser = async ( req = request, res = response ): Promise<void> 
             message: `Error al realitzar el login`
         });
     }
+}
+
+export const blockUser = async ( req = request, res = response ): Promise<void> => {
+    
 }
