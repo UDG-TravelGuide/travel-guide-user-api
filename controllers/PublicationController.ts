@@ -211,31 +211,33 @@ const getFullInfoOfPublications = async (publications: any): Promise<Publication
 }
 
 export const getAllInfoOfPublication = async(publication: any): Promise<Publication> => {
-    const contents = await ContentModel.findAll({ where: { publicationId: publication.id } });
+    const contents: any = await ContentModel.findAll({ where: { publicationId: publication.id } });
     let fullContents: Content[] = [];
 
     if (contents instanceof Array && contents.length > 0) {
-        contents.forEach(async (content: any) => {
-            let currentContent: Content = {
-                id: content.id,
-                type: content.type,
-                position: content.position,
+        for (let i: number = 0; i < contents.length; i++) {
+            let content: Content = {
+                id: contents[i].id,
+                type: contents[i].type,
+                position: contents[i].position,
                 value: null
             };
 
-            if (currentContent.type == 'text') {
-                currentContent.value = content.value;
-            } else if (currentContent.type == 'image') {
-                const image: any = await ImageModel.findOne({ where: { contentId: currentContent.id } });
+            if (content.type == 'text') {
+                content.value = content.value;
+            } else if (content.type == 'image') {
+                const image: any = await ImageModel.findOne({ where: { contentId: content.id } });
                 if (image instanceof ImageModel && image != null) {
-                    currentContent.image = {
+                    content.image = {
                         id: image.id,
                         value: image.value,
                         contentId: image.contentId
                     };
                 }
             }
-        });
+
+            fullContents.push(content);
+        }
     }
 
     let currentPublication: Publication = {
