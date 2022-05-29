@@ -14,6 +14,7 @@ import { UserModel } from './User';
 import { PublicationModel } from './Publication';
 import { DirectionModel } from './Direction';
 import { ContentModel } from './Content';
+import { RouteModel } from './Route';
 
 export class Server {
     private _app: express.Application;
@@ -69,7 +70,8 @@ export class Server {
     private _initDbRelations(): void {
         ContentModel.belongsTo(PublicationModel, { foreignKey: 'publicationId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
         PublicationModel.belongsTo(UserModel, { foreignKey: 'authorId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
-        DirectionModel.belongsTo(ContentModel, { foreignKey: 'contentId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        DirectionModel.belongsTo(RouteModel, { foreignKey: 'contentId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        RouteModel.belongsTo(PublicationModel, { foreignKey: 'publicationId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
         ImageModel.belongsTo(ContentModel, { foreignKey: 'contentId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
         PublicationModel.belongsToMany(UserModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
         UserModel.belongsToMany(PublicationModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });

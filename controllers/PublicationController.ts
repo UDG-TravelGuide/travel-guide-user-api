@@ -1,3 +1,4 @@
+import { RouteModel } from './../models/Route';
 import { response, request } from 'express';
 // Interfaces
 import { Publication } from '../interfaces/PublicationInterfaces';
@@ -104,6 +105,35 @@ export const createPublication = async( req = request, res = response ): Promise
         const publication: any = await PublicationModel.create(newPublication);
         await publication.save();
 
+        let newRoute = {
+            latitudeInital: body.route?.latitudeInitial,
+            longitudeInital: body.route?.longitudeInitial,
+            latitudeFinal: body.route?.latitudeFinal,
+            longitudeFinal: body.route?.longitudeFinal,
+            publicationId: publication.id,
+            directions: []
+        };
+
+        const route: any = await RouteModel.create(newRoute);
+        await route.save();
+
+        if (body.route && body.route.directions) {
+            const allDirections: Direction[] = body.route.directions;
+            for (let i: number = 0; i < allDirections.length; i++) {
+                const direction: Direction = allDirections[i];
+                const createDirection: any = await DirectionModel.create({
+                    latitudeOrigin: direction.latitudeOrigin,
+                    longitudeOrigin: direction.longitudeOrigin,
+                    latitudeDestiny: direction.latitudeDestiny,
+                    longitudeDestiny: direction.longitudeDestiny,
+                    routeId: route.id
+                });
+
+                await createDirection.save();
+            }
+            newRoute.directions = allDirections;
+        }
+
         const contents: Content[] = body.contents;
         for (let i: number = 0; i < contents.length; i++) {
             const content: Content = contents[i];
@@ -115,20 +145,7 @@ export const createPublication = async( req = request, res = response ): Promise
             });
             await createContent.save();
 
-            if (content.type == 'route') {
-                const directions: Direction[] = content.directions;
-                for (let j: number = 0; j < directions.length; j++) {
-                    const direction: Direction = directions[j];
-                    const createDirection: any = await DirectionModel.create({
-                        latitudeOrigin: direction.latitudeOrigin,
-                        longitudeOrigin: direction.longitudeOrigin,
-                        latitudeDestiny: direction.latitudeDestiny,
-                        longitudeDestiny: direction.longitudeDestiny,
-                        contentId: createContent.id
-                    });
-                    await createDirection.save();
-                }
-            } else if (content.type == 'image') {
+            if (content.type == 'image') {
                 const createImage = await ImageModel.create({
                     value: createContent.image,
                     contentId: createContent.id
@@ -141,6 +158,7 @@ export const createPublication = async( req = request, res = response ): Promise
             title: newPublication.title,
             description: newPublication.description,
             authorId: newPublication.authorId,
+            route: newRoute,
             contents: contents
         });
     } catch (error) {
@@ -216,23 +234,46 @@ export const getAllInfoOfPublication = async(publication: any): Promise<Publicat
                         contentId: image.contentId
                     };
                 }
-            } else if (currentContent.type == 'route') {
-                const directions: any = await DirectionModel.findAll({ where: { contentId: currentContent.id } });
-                if (directions instanceof Array && directions.length > 0) {
-                    currentContent.directions = directions;
-                }
             }
         });
     }
 
-    const currentPublication: Publication = {
+    let currentPublication: Publication = {
         id: publication.id,
         title: publication.title,
         description: publication.description,
         authorId: publication.authorId,
         countryAlphaCode: publication.countryAlphaCode,
         contents: fullContents,
+        route: null
     };
+
+    const route: any = await RouteModel.findOne({ where: { publicationId: publication.id } });
+    if (route instanceof RouteModel && route != null) {
+        let allDirections: Direction[] = [];
+
+        const directions: any = await DirectionModel.findAll({ where: { routeId: route.id } });
+        if (directions instanceof Array && directions.length > 0) {
+            for (let i: number = 0; i < directions.length; i++) {
+                const direction: Direction = {
+                    latitudeOrigin: directions[i].latitudeOrigin,
+                    longitudeOrigin: directions[i].longitudeOrigin,
+                    latitudeDestiny: directions[i].latitudeDestiny,
+                    longitudeDestiny: directions[i].longitudeDestiny,
+                    routeId: route.id
+                };
+                allDirections.push(direction);
+            }
+        }
+
+        currentPublication.route = {
+            longitudeInitial: route.longitudeInitial,
+            latitudeInitial: route.latitudeInitial,
+            longitudeFinal: route.longitudeFinal,
+            latitudeFinal: route.latitudeFinal,
+            directions: allDirections
+        };
+    }
 
     return currentPublication;
 }

@@ -1,5 +1,5 @@
 import { Content } from "./ContentInterface";
-import { Country } from "./CountryInterface";
+import { Route } from "./RouteInterface";
 
 export interface Publication {
     id?: number;
@@ -7,5 +7,6 @@ export interface Publication {
     description?: string;
     contents: Content[];
     authorId: number;
+    route: Route;
     countryAlphaCode: string;
 }

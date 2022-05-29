@@ -1,49 +1,49 @@
 import { Sequelize, INTEGER, Model, ModelCtor } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
-// MODELS
-import { RouteModel } from './Route';
+// Models
+import { PublicationModel } from './Publication';
 
 const sequelize: Sequelize = getSequelize();
 
-const getDirection = () => {
-    let directionModel: ModelCtor<Model<any, any>>;
+const getRoute = () => {
+    let routeModel: ModelCtor<Model<any, any>>;
     if (sequelize) {
-        directionModel = sequelize.define('Direction', {
+        routeModel = sequelize.define('Route', {
             id: {
                 type: INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
                 allowNull: false
             },
-            latitudeOrigin: {
+            latitudeInital: {
                 type: INTEGER,
                 allowNull: false
             },
-            longitudeOrigin: {
+            longitudeInital: {
                 type: INTEGER,
                 allowNull: false
             },
-            latitudeDestiny: {
+            latitudeFinal: {
                 type: INTEGER,
                 allowNull: false
             },
-            longitudeDestiny: {
+            longitudeFinal: {
                 type: INTEGER,
                 allowNull: false
             },
-            routeId: {
+            publicationId: {
                 type: INTEGER,
                 allowNull: false,
                 references: {
-                    model: RouteModel,
+                    model: PublicationModel,
                     key: 'id'
                 }
             }
         });
     } else {
-        directionModel = null;
+        routeModel = null;
     }
-    return directionModel;
+    return routeModel;
 }
 
-export const DirectionModel = getDirection();
+export const RouteModel = getRoute();

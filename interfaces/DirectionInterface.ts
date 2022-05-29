@@ -4,5 +4,5 @@ export interface Direction {
     longitudeOrigin: number;
     latitudeDestiny: number;
     longitudeDestiny: number;
-    contentId?: number;
+    routeId?: number;
 }
