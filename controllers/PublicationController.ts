@@ -275,33 +275,37 @@ export const createPublication = async( req = request, res = response ): Promise
         const publication: any = await PublicationModel.create(newPublication);
         await publication.save();
 
-        let newRoute = {
-            latitudeInital: body.route?.latitudeInitial,
-            longitudeInital: body.route?.longitudeInitial,
-            latitudeFinal: body.route?.latitudeFinal,
-            longitudeFinal: body.route?.longitudeFinal,
-            publicationId: publication.id,
-            directions: []
-        };
-
-        const route: any = await RouteModel.create(newRoute);
-        await route.save();
-
-        if (body.route && body.route.directions) {
-            const allDirections: Direction[] = body.route.directions;
-            for (let i: number = 0; i < allDirections.length; i++) {
-                const direction: Direction = allDirections[i];
-                const createDirection: any = await DirectionModel.create({
-                    latitudeOrigin: direction.latitudeOrigin,
-                    longitudeOrigin: direction.longitudeOrigin,
-                    latitudeDestiny: direction.latitudeDestiny,
-                    longitudeDestiny: direction.longitudeDestiny,
-                    routeId: route.id
-                });
-
-                await createDirection.save();
+        let newRoute = null;
+    
+        if (body.route) {
+            newRoute = {
+                latitudeInital: body.route?.latitudeInitial,
+                longitudeInital: body.route?.longitudeInitial,
+                latitudeFinal: body.route?.latitudeFinal,
+                longitudeFinal: body.route?.longitudeFinal,
+                publicationId: publication.id,
+                directions: []
+            };
+    
+            const route: any = await RouteModel.create(newRoute);
+            await route.save();
+    
+            if (body.route.directions) {
+                const allDirections: Direction[] = body.route.directions;
+                for (let i: number = 0; i < allDirections.length; i++) {
+                    const direction: Direction = allDirections[i];
+                    const createDirection: any = await DirectionModel.create({
+                        latitudeOrigin: direction.latitudeOrigin,
+                        longitudeOrigin: direction.longitudeOrigin,
+                        latitudeDestiny: direction.latitudeDestiny,
+                        longitudeDestiny: direction.longitudeDestiny,
+                        routeId: route.id
+                    });
+    
+                    await createDirection.save();
+                }
+                newRoute.directions = allDirections;
             }
-            newRoute.directions = allDirections;
         }
 
         const contents: Content[] = body.contents;
