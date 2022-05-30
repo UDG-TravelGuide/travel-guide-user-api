@@ -10,7 +10,8 @@ import {
     loginUser,
     getCurrentUser,
     blockUser,
-    unblockUser
+    unblockUser,
+    changeRole
 } from "../controllers/UserController";
 
 export const UserRouter: Router = Router();
@@ -53,3 +54,7 @@ UserRouter.put('/block/:id', [
 UserRouter.put('/unblock/:id', [
     authorizeAdmin
 ], unblockUser);
+
+UserRouter.put('/changeRole/:id', [
+    authorizeAdmin
+], changeRole);
