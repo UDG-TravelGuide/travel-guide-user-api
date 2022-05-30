@@ -11,7 +11,8 @@ import {
     getCurrentUser,
     blockUser,
     unblockUser,
-    changeRole
+    changeRole,
+    getRefreshToken
 } from "../controllers/UserController";
 
 export const UserRouter: Router = Router();
@@ -23,6 +24,14 @@ UserRouter.get('/', [
 UserRouter.get('/current', [
     verifyToken
 ], getCurrentUser);
+
+UserRouter.get('/refreshToken', [
+    verifyToken
+], getRefreshToken);
+
+UserRouter.get('/refreshTokenBo', [
+    authorizeAdmin
+], getRefreshToken);
 
 UserRouter.get('/:id', [
     verifyToken

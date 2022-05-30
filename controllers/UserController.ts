@@ -25,16 +25,15 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     const params = req.params;
     
     try {
-        const user: any = await UserModel.findAll({ where: { id: params.id } });
-        if (user instanceof Array && user.length > 0) {
+        const user: any = await UserModel.findOne({ where: { id: params.id } });
+        if (user instanceof UserModel && user != null) {
             const returnUser = {
-                id: user[0].id,
-                userName: user[0].userName,
-                email: user[0].email,
-                password: user[0].password,
-                birthDate: user[0].birthDate,
-                profilePhoto: user[0].profilePhoto,
-                points: user[0].points
+                id: user.id,
+                userName: user.userName,
+                email: user.email,
+                birthDate: user.birthDate,
+                profilePhoto: user.profilePhoto,
+                points: user.points
             };
             res.json( returnUser );
         } else {
@@ -80,8 +79,26 @@ export const getCurrentUser = async( req = request, res = response ): Promise<vo
             userName: user.name
         });
     } catch (error) {
-        res.status(500).send({
+        res.status(500).json({
             message: "S'ha produit un error al obtenir l'usuari actual"
+        });
+    }
+}
+
+export const getRefreshToken = async( req = request, res = response ): Promise<void> => {
+    try {
+        const user: JWTUser = await getCurrentUserByToken(req, res);
+        const refreshToken = sign({
+            name: user.name,
+            id: user.id
+        }, process.env.TOKEN_SECRET);
+
+        res.status(200).json({
+            refreshToken: refreshToken
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "S'ha produit un error al intentar comprovar el token"
         });
     }
 }
