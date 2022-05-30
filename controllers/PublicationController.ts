@@ -410,15 +410,9 @@ export const getAllInfoOfPublication = async(publication: any): Promise<Publicat
         }
     }
 
-    let currentPublication: Publication = {
-        id: publication.id,
-        title: publication.title,
-        description: publication.description,
-        authorId: publication.authorId,
-        countryAlphaCode: publication.countryAlphaCode,
-        contents: fullContents,
-        route: null
-    };
+    let currentPublication = publication;
+    currentPublication.contents = fullContents;
+    currentPublication.route = null;
 
     const route: any = await RouteModel.findOne({ where: { publicationId: publication.id } });
     if (route instanceof RouteModel && route != null) {
