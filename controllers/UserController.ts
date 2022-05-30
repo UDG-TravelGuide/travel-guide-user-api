@@ -223,5 +223,41 @@ export const loginUser = async ( req = request, res = response ): Promise<void> 
 }
 
 export const blockUser = async ( req = request, res = response ): Promise<void> => {
-    
+    const params: any = req.params;
+
+    UserModel.update(
+        {
+            blocked: true
+        },
+        { where: { id: params.id } }
+    ).then(_ => {
+        res.status(200).json({
+            message: `S'ha bloquejat correctament l'usuari`
+        });
+    }).catch(error => {
+        console.error(error);
+        res.status(500).json({
+            message: `Error al bloquejar l'usuari amb id: ${ params.id }`
+        });
+    });
+}
+
+export const unblockUser = async ( req = request, res = response ): Promise<void> => {
+    const params: any = req.params;
+
+    UserModel.update(
+        {
+            blocked: false
+        },
+        { where: { id: params.id } }
+    ).then(_ => {
+        res.status(200).json({
+            message: `S'ha bloquejat correctament l'usuari`
+        });
+    }).catch(error => {
+        console.error(error);
+        res.status(500).json({
+            message: `Error al bloquejar l'usuari amb id: ${ params.id }`
+        });
+    });
 }

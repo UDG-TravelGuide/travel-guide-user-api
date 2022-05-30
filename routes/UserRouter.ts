@@ -8,7 +8,9 @@ import {
     createUser,
     editUser,
     loginUser,
-    getCurrentUser
+    getCurrentUser,
+    blockUser,
+    unblockUser
 } from "../controllers/UserController";
 
 export const UserRouter: Router = Router();
@@ -43,3 +45,11 @@ UserRouter.put('/edit/:id', [
     check('password').not().isEmpty(),
     check('birthDate').isDate({ format: 'DD-MM-YYYY' })
 ], editUser);
+
+UserRouter.put('/block/:id', [
+    authorizeAdmin
+], blockUser);
+
+UserRouter.put('/unblock/:id', [
+    authorizeAdmin
+], unblockUser);
