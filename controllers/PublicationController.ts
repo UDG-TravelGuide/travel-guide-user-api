@@ -41,7 +41,7 @@ export const getPublicationsForBo = async( _ = request, res = response ): Promis
     try {
         const publications = await PublicationModel.findAll();
         if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications, true);
             res.json( allPublications );
         } else {
             res.json( [] );
@@ -368,19 +368,19 @@ export const deletePublication = async( req = request, res = response ): Promise
     }
 }
 
-const getFullInfoOfPublications = async (publications: any): Promise<Publication[]> => {
+const getFullInfoOfPublications = async (publications: any, showBoFields?: boolean): Promise<Publication[]> => {
     let fullPublications: Publication[] = [];
 
     for (let i: number = 0; i < publications.length; i++) {
         const publication: any = publications[i];
-        const fullPublication: Publication = await getAllInfoOfPublication(publication);
+        const fullPublication: Publication = await getAllInfoOfPublication(publication, showBoFields);
         fullPublications.push(fullPublication);
     }
 
     return fullPublications;
 }
 
-export const getAllInfoOfPublication = async(publication: any): Promise<Publication> => {
+export const getAllInfoOfPublication = async(publication: any, showBoFields?: boolean): Promise<Publication> => {
     const contents: any = await ContentModel.findAll({ where: { publicationId: publication.id } });
     let fullContents: Content[] = [];
 
@@ -410,9 +410,32 @@ export const getAllInfoOfPublication = async(publication: any): Promise<Publicat
         }
     }
 
-    let currentPublication: Publication = publication;
-    currentPublication.contents = fullContents;
-    currentPublication.route = null;
+    let currentPublication: Publication = null;
+
+    if (showBoFields) {
+        currentPublication = {
+            id: publication.id,
+            authorId: publication.id,
+            title: publication.title,
+            description: publication.description,
+            countryAlphaCode: publication.countryAlphaCode,
+            numberOfReports: publication.numberOfReports,
+            route: null,
+            points: publication.points,
+            contents: fullContents
+        };
+    } else {
+        currentPublication = {
+            id: publication.id,
+            authorId: publication.id,
+            title: publication.title,
+            description: publication.description,
+            countryAlphaCode: publication.countryAlphaCode,
+            points: publication.points,
+            route: null,
+            contents: fullContents
+        };
+    }
 
     const route: any = await RouteModel.findOne({ where: { publicationId: publication.id } });
     if (route instanceof RouteModel && route != null) {
