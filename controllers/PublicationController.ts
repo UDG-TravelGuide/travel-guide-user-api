@@ -372,6 +372,32 @@ export const deletePublication = async( req = request, res = response ): Promise
     }
 }
 
+export const deletePublicationBo = async( req = request, res = response ): Promise<void> => {
+    const params = req.params;
+
+    try {
+        PublicationModel.destroy({
+            where: {
+                id: params.publicationId
+            }
+        }).then(_ => {
+            res.status(200).json({
+                message: `S'ha eliminat correctament la publicació`
+            });
+        }).catch(error => {
+            console.error(error);
+            res.status(500).json({
+                message: `Error al eliminar la publicació ${ params.publicationId }`
+            });
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: `Ha sorgit un error al intentar esborrar la publicació amb la id: ${ params.publicationId }`
+        });
+    }
+}
+
 const getFullInfoOfPublications = async (publications: any, showBoFields?: boolean): Promise<Publication[]> => {
     let fullPublications: Publication[] = [];
 

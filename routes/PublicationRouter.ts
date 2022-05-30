@@ -9,7 +9,8 @@ import {
     getPublicationsByAuthor,
     deletePublication,
     getPublicationsForBo,
-    editPublication
+    editPublication,
+    deletePublicationBo
 } from "../controllers/PublicationController";
 
 
@@ -46,3 +47,7 @@ PublicationRouter.post('/new', [
 PublicationRouter.delete('/delete/:publicationId', [
     verifyToken
 ], deletePublication);
+
+PublicationRouter.delete('/deleteBo/:publicationId', [
+    authorizeAdmin
+], deletePublicationBo);
