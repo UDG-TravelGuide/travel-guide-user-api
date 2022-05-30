@@ -40,7 +40,8 @@ const getUser = () => {
             },
             role: {
                 type: STRING,
-                allowNull: false
+                allowNull: true,
+                defaultValue: 'USER'
             }
         });
     } else {
