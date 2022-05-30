@@ -6,7 +6,9 @@ export const authorizeAdmin = ( req = request, res = response, next ) => {
     const mainRole = 'ADMIN';
 
     if (!bearerHeader) {
-        return res.status(401).send("És necessari loguejar-se per realitzar aquestes operacions");
+        return res.status(401).json({
+            message: "És necessari loguejar-se per realitzar aquestes operacions"
+        });
     }
 
     let token = '';
@@ -21,19 +23,27 @@ export const authorizeAdmin = ( req = request, res = response, next ) => {
     try {
         const verified = verify(token, process.env.TOKEN_SECRET);
         if (!verified) {
-            return res.status(401).send("Aquest token és invalid");
+            return res.status(401).json({
+                message: "Aquest token és invalid"
+            });
         }
 
         if (typeof verified !== 'string') {
             const user = verified;
             if (user.role != mainRole) {
-                return res.status(401).send("Aquest usuari no te els permisos per realitzar aquesta acció");
+                return res.status(401).json({
+                    message: "Aquest usuari no te els permisos per realitzar aquesta acció"
+                });
             }
         } else {
-            return res.status(401).send("Aquest token és invalid");
+            return res.status(401).json({
+                message: "Aquest token és invalid"
+            });
         }
     } catch (err) {
-        return res.status(401).send("Aquest token és invalid");
+        return res.status(401).json({
+            message: "Aquest token és invalid"
+        });
     }
     return next();
 }

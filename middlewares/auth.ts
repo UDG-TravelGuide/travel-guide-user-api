@@ -6,7 +6,9 @@ export const verifyToken = ( req = request, res = response, next ) => {
 
 
     if (!bearerHeader) {
-        return res.status(401).send("És necessari loguejar-se per realitzar aquestes operacions");
+        return res.status(401).json({
+            message: "És necessari loguejar-se per realitzar aquestes operacions"
+        });
     }
 
     let token = '';
@@ -21,20 +23,28 @@ export const verifyToken = ( req = request, res = response, next ) => {
     try {
         const decoded: string | JwtPayload = decode(token);
         if ((typeof decoded !== "string") && Date.now() >= decoded.exp * 1000) {
-            return res.status(401).send("El token ha caducat");
+            return res.status(401).json({
+                message: "El token ha caducat"
+            });
         }
 
         const verified = verify(token, process.env.TOKEN_SECRET);
         if (!verified) {
-            return res.status(401).send("Aquest token és invalid");
+            return res.status(401).json({
+                message: "Aquest token és invalid"
+            });
         }
 
         const signed = sign(token, process.env.TOKEN_SECRET);
         if (!signed) {
-            return res.status(401).send("Aquest token és invalid");
+            return res.status(401).json({
+                message: "Aquest token és invalid"
+            });
         }
     } catch (err) {
-        return res.status(401).send("Aquest token és invalid");
+        return res.status(401).json({
+            message: "Aquest token és invalid"
+        });
     }
     return next();
 }
