@@ -47,14 +47,14 @@ UserRouter.put('/edit/:id', [
     check('birthDate').isDate({ format: 'DD-MM-YYYY' })
 ], editUser);
 
-UserRouter.put('/block/:id', [
+UserRouter.patch('/block/:id', [
     authorizeAdmin
 ], blockUser);
 
-UserRouter.put('/unblock/:id', [
+UserRouter.patch('/unblock/:id', [
     authorizeAdmin
 ], unblockUser);
 
-UserRouter.put('/changeRole/:id', [
+UserRouter.patch('/changeRole/:id', [
     authorizeAdmin
 ], changeRole);
