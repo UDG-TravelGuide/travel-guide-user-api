@@ -410,7 +410,7 @@ export const getAllInfoOfPublication = async(publication: any): Promise<Publicat
         }
     }
 
-    let currentPublication = publication;
+    let currentPublication: Publication = publication;
     currentPublication.contents = fullContents;
     currentPublication.route = null;
 
