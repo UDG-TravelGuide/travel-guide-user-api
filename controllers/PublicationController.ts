@@ -416,6 +416,7 @@ export const getAllInfoOfPublication = async(publication: any, showBoFields?: bo
         description: publication.description,
         authorId: publication.authorId,
         countryAlphaCode: publication.countryAlphaCode,
+        points: publication.points,
         contents: fullContents,
         route: null
     };
