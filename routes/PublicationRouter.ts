@@ -1,12 +1,15 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/auth";
+import { authorizeAdmin } from "../middlewares/admin";
 import { 
     createPublication,
     getPublication, 
     getPublications,
     getPublicationsByCountry,
     getPublicationsByAuthor,
-    deletePublication
+    deletePublication,
+    getPublicationsForBo,
+    editPublication
 } from "../controllers/PublicationController";
 
 
@@ -15,6 +18,10 @@ export const PublicationRouter: Router = Router();
 PublicationRouter.get('/', [
     verifyToken
 ], getPublications);
+
+PublicationRouter.get('/backoffice', [
+    authorizeAdmin
+], getPublicationsForBo);
 
 PublicationRouter.get('/:id', [
     verifyToken
@@ -27,6 +34,10 @@ PublicationRouter.get('/byCountry/:country', [
 PublicationRouter.get('/byAuthor/:authorId', [
     verifyToken
 ], getPublicationsByAuthor);
+
+PublicationRouter.put('/edit/:id', [
+    verifyToken
+], editPublication);
 
 PublicationRouter.post('/new', [
     verifyToken

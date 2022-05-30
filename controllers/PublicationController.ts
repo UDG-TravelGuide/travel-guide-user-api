@@ -1,18 +1,43 @@
 import { RouteModel } from './../models/Route';
 import { response, request } from 'express';
+// Controllers
+import { getCurrentUserByToken } from './UserController';
 // Interfaces
 import { Publication } from '../interfaces/PublicationInterfaces';
 import { Content } from '../interfaces/ContentInterface';
 import { Direction } from '../interfaces/DirectionInterface';
+import { Route } from '../interfaces/RouteInterface';
 import { JWTUser } from '../interfaces/JWTUser';
 // Models
 import { ContentModel } from '../models/Content';
 import { PublicationModel } from '../models/Publication';
 import { DirectionModel } from '../models/Direction';
 import { ImageModel } from '../models/Image';
-import { getCurrentUserByToken } from './UserController';
 
 export const getPublications = async( _ = request, res = response ): Promise<void> => {
+    try {
+        const publications = await PublicationModel.findAll({
+            attributes: {
+                exclude: [
+                    'numberOfReports'
+                ]
+            }
+        });
+        if (publications instanceof Array && publications.length > 0) {
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
+            res.json( allPublications );
+        } else {
+            res.json( [] );
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: 'Error al obtenir les publicacions'
+        });
+    }
+}
+
+export const getPublicationsForBo = async( _ = request, res = response ): Promise<void> => {
     try {
         const publications = await PublicationModel.findAll();
         if (publications instanceof Array && publications.length > 0) {
@@ -85,6 +110,151 @@ export const getPublication = async( req = request, res = response ): Promise<vo
         console.error(error);
         res.status(500).json({
             message: `Error al obtenir la publicacio amb id: ${ params.id }`
+        });
+    }
+}
+
+export const editPublication = async( req = request, res = response ): Promise<void> => {
+    const params = req.params;
+    const body: Publication = req.body;
+
+    try {
+        const publication: any = await PublicationModel.findOne({ where: { id: params.id } });
+        if (publication instanceof PublicationModel && publication != null) {
+            await PublicationModel.update(
+                {
+                    title: body.title,
+                    description: body.description,
+                    countryAlphaCode: body.countryAlphaCode
+                },
+                { where: { id: params.id } }
+            );
+
+            const modContents: Content[] = body.contents;
+            const actualContents = await ContentModel.findAll({ where: { publicationId: publication.id } });
+            if (actualContents instanceof Array && actualContents.length > 0) {
+                for (let i: number = 0; i < actualContents.length; i++) {
+                    const content: any = actualContents[i];
+                    const findContent = modContents.find(cont => cont.id == content.id);
+                    if (findContent == null || findContent == undefined) {
+                        await ContentModel.destroy({
+                            where: { id: content.id }
+                        });
+                    } else if (content.value != findContent.value || content.position != findContent.value) {
+                        await ContentModel.update(
+                            {
+                                value: findContent.value,
+                                position: findContent.position
+                            },
+                            { where: { id: content.id } }
+                        );
+                    }
+                }
+            }
+
+            const newContents: Content[] = modContents.filter(cont => cont.id == null || cont.id == undefined);
+            for (let i: number = 0; i < newContents.length; i++) {
+                const content: any = newContents[i];
+                const createContent: any = await ContentModel.create({
+                    type: content.type,
+                    value: content.value,
+                    position: content.position,
+                    publicationId: publication.id
+                });
+                await createContent.save();
+            }
+
+            const actualRoute: any = await RouteModel.findOne({ where: { publicationId: publication.id } });
+            const updateRoute: Route = body.route;
+            
+            if (actualRoute instanceof RouteModel && publication != null && (updateRoute == null || updateRoute == undefined)) {
+                await DirectionModel.destroy({ where: { routeId: actualRoute.id } });
+                await RouteModel.destroy({ where: { id: actualRoute.id } });
+            } else if (actualRoute instanceof RouteModel && (publication == null || publication == undefined)) {
+                const route: any = await RouteModel.create({
+                    latitudeInital: updateRoute.latitudeInitial,
+                    longitudeInital: updateRoute.longitudeInitial,
+                    latitudeFinal: updateRoute.latitudeFinal,
+                    longitudeFinal: updateRoute.longitudeFinal,
+                    publicationId: publication.id
+                });
+                await route.save();
+
+                if (body.route && body.route.directions) {
+                    const allDirections: Direction[] = body.route.directions;
+                    for (let i: number = 0; i < allDirections.length; i++) {
+                        const direction: Direction = allDirections[i];
+                        const createDirection: any = await DirectionModel.create({
+                            latitudeOrigin: direction.latitudeOrigin,
+                            longitudeOrigin: direction.longitudeOrigin,
+                            latitudeDestiny: direction.latitudeDestiny,
+                            longitudeDestiny: direction.longitudeDestiny,
+                            routeId: route.id
+                        });
+        
+                        await createDirection.save();
+                    }
+                }
+            } else {
+                await RouteModel.update(
+                    {
+                        latitudeInital: updateRoute.latitudeInitial,
+                        longitudeInital: updateRoute.longitudeInitial,
+                        latitudeFinal: updateRoute.latitudeFinal,
+                        longitudeFinal: updateRoute.longitudeFinal
+                    },
+                    { where: { id: actualRoute.id } }
+                );
+
+                const actualDirections: any = await DirectionModel.findAll({ where: { routeId: actualRoute.id } });
+                const modDirections: Direction[] = body.route.directions;
+                if (actualDirections instanceof Array && actualDirections.length > 0) {
+                    for (let i: number = 0; i < actualDirections.length; i++) {
+                        const direction: any = actualDirections[i];
+                        const findDirection: Direction = modDirections.find(dir => dir.id == direction.id);
+
+                        if (findDirection == null || findDirection == undefined) {
+                            await DirectionModel.destroy({ where: { id: direction.id } });
+                        } else {
+                            await DirectionModel.update(
+                                {
+                                    latitudeOrigin: findDirection.latitudeOrigin,
+                                    longitudeOrigin: findDirection.longitudeOrigin,
+                                    latitudeDestiny: findDirection.latitudeDestiny,
+                                    longitudeDestiny: findDirection.longitudeDestiny
+                                },
+                                { where: { id: direction.id } }
+                            );
+                        }
+                    }
+                }
+
+                const newDirections: Direction[] = modDirections.filter(dir => dir.id == null || dir.id == undefined);
+                for (let i: number = 0; i < newDirections.length; i++) {
+                    const actualDirection: Direction = newDirections[i];
+                    const direction: any = await DirectionModel.create({
+                        latitudeOrigin: actualDirection.latitudeOrigin,
+                        longitudeOrigin: actualDirection.longitudeOrigin,
+                        latitudeDestiny: actualDirection.latitudeDestiny,
+                        longitudeDestiny: actualDirection.longitudeDestiny,
+                        routeId: actualRoute.id
+                    });
+                    await direction.save();
+                }
+            }
+
+            res.status(200).json({
+                message: `S'ha actualitzat la publicació correctament`
+            });
+        } else {
+            res.status(400).json({
+                message: `No s'ha trobat la publicacio amb id: ${ params.id }`
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: `Error al editar la publicacio amb id: ${ params.id }`
         });
     }
 }

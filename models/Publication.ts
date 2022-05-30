@@ -27,6 +27,16 @@ const getPublication = () => {
                 type: STRING,
                 allowNull: false
             },
+            numberOfReports: {
+                type: INTEGER,
+                allowNull: false,
+                defaultValue: 0
+            },
+            points: {
+                type: INTEGER,
+                allowNull: false,
+                defaultValue: 0
+            },
             authorId: {
                 type: INTEGER,
                 allowNull: false,
