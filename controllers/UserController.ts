@@ -88,13 +88,15 @@ export const getCurrentUser = async( req = request, res = response ): Promise<vo
 export const getRefreshToken = async( req = request, res = response ): Promise<void> => {
     try {
         const user: JWTUser = await getCurrentUserByToken(req, res);
+        const getUser: any = await UserModel.findOne({ where: { id: user.id } });
         const refreshToken = sign({
-            name: user.name,
-            id: user.id
+            id: getUser.id,
+            name: getUser.userName,
+            role: getUser.role
         }, process.env.TOKEN_SECRET);
 
         res.status(200).json({
-            refreshToken: refreshToken
+            token: refreshToken
         });
     } catch (error) {
         res.status(500).json({
