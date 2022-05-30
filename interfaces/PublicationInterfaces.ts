@@ -10,4 +10,5 @@ export interface Publication {
     route: Route;
     countryAlphaCode: string;
     points?: number;
+    numberOfReports?: number;
 }
