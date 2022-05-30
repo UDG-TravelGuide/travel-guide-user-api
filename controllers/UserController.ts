@@ -25,9 +25,18 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
     const params = req.params;
     
     try {
-        const user = await UserModel.findAll({ where: { id: params.id } });
+        const user: any = await UserModel.findAll({ where: { id: params.id } });
         if (user instanceof Array && user.length > 0) {
-            res.json( user[0] );
+            const returnUser = {
+                id: user[0].id,
+                userName: user[0].userName,
+                email: user[0].email,
+                password: user[0].password,
+                birthDate: user[0].birthDate,
+                profilePhoto: user[0].profilePhoto,
+                points: user[0].points
+            };
+            res.json( returnUser );
         } else {
             res.status(400).json({
                 message: `No s'ha trobat el usuari amb id: ${ params.id }`

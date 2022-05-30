@@ -1,4 +1,4 @@
-import { Sequelize, STRING, INTEGER, Model, ModelCtor } from 'sequelize';
+import { Sequelize, STRING, INTEGER, Model, ModelCtor, BOOLEAN } from 'sequelize';
 import { getSequelize } from '../config/dbConfig';
 
 const sequelize: Sequelize = getSequelize();
@@ -40,8 +40,13 @@ const getUser = () => {
             },
             role: {
                 type: STRING,
-                allowNull: true,
+                allowNull: false,
                 defaultValue: 'USER'
+            },
+            blocked: {
+                type: BOOLEAN,
+                allowNull: true,
+                defaultValue: false
             }
         });
     } else {
