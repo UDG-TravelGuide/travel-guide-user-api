@@ -15,11 +15,11 @@ const getRoute = () => {
                 autoIncrement: true,
                 allowNull: false
             },
-            latitudeInital: {
+            latitudeInitial: {
                 type: INTEGER,
                 allowNull: false
             },
-            longitudeInital: {
+            longitudeInitial: {
                 type: INTEGER,
                 allowNull: false
             },

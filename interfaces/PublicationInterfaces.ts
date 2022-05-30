@@ -9,4 +9,5 @@ export interface Publication {
     authorId: number;
     route: Route;
     countryAlphaCode: string;
+    points?: number;
 }
