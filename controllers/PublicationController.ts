@@ -410,31 +410,18 @@ export const getAllInfoOfPublication = async(publication: any, showBoFields?: bo
         }
     }
 
-    let currentPublication: Publication = null;
+    let currentPublication: Publication = {
+        id: publication.id,
+        title: publication.title,
+        description: publication.description,
+        authorId: publication.authorId,
+        countryAlphaCode: publication.countryAlphaCode,
+        contents: fullContents,
+        route: null
+    };
 
     if (showBoFields) {
-        currentPublication = {
-            id: publication.id,
-            authorId: publication.id,
-            title: publication.title,
-            description: publication.description,
-            countryAlphaCode: publication.countryAlphaCode,
-            numberOfReports: publication.numberOfReports,
-            route: null,
-            points: publication.points,
-            contents: fullContents
-        };
-    } else {
-        currentPublication = {
-            id: publication.id,
-            authorId: publication.id,
-            title: publication.title,
-            description: publication.description,
-            countryAlphaCode: publication.countryAlphaCode,
-            points: publication.points,
-            route: null,
-            contents: fullContents
-        };
+        currentPublication.numberOfReports = publication.numberOfReports;
     }
 
     const route: any = await RouteModel.findOne({ where: { publicationId: publication.id } });
