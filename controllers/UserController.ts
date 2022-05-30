@@ -252,12 +252,12 @@ export const unblockUser = async ( req = request, res = response ): Promise<void
         { where: { id: params.id } }
     ).then(_ => {
         res.status(200).json({
-            message: `S'ha bloquejat correctament l'usuari`
+            message: `S'ha desbloquejat correctament l'usuari`
         });
     }).catch(error => {
         console.error(error);
         res.status(500).json({
-            message: `Error al bloquejar l'usuari amb id: ${ params.id }`
+            message: `Error al desbloquejar l'usuari amb id: ${ params.id }`
         });
     });
 }
@@ -273,12 +273,12 @@ export const changeRole = async ( req = request, res = response ): Promise<void>
         { where: { id: params.id } }
     ).then(_ => {
         res.status(200).json({
-            message: `S'ha bloquejat correctament l'usuari`
+            message: `S'ha canviar correctament el rol de l'usuari`
         });
     }).catch(error => {
         console.error(error);
         res.status(500).json({
-            message: `Error al bloquejar l'usuari amb id: ${ params.id }`
+            message: `Error al canviar el rol de l'usuari amb id: ${ params.id }`
         });
     });
 }
