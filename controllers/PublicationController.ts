@@ -321,7 +321,7 @@ export const createPublication = async( req = request, res = response ): Promise
 
             if (content.type == 'image') {
                 const createImage = await ImageModel.create({
-                    value: createContent.image,
+                    value: content.image?.value,
                     contentId: createContent.id
                 });
                 await createImage.save();
