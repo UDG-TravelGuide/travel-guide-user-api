@@ -25,16 +25,18 @@ jobs:
     - run: npm install
     - name: tsc
       uses: icrawl/action-tsc@v1
+
+
   deploy:
+    
+    runs-on: ubuntu-latest
 
-  runs-on: ubuntu-latest
+    needs: [build]
 
-  needs: [build]
-
-  steps:
-  - uses: actions/checkout@v2
-  - uses: AkhileshNS/heroku-deploy@v3.12.12
-    with:
-        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-        heroku_app_name: "travelguideuserapi"
-        heroku_email: "hsaddouki@gmail.com"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: AkhileshNS/heroku-deploy@v3.12.12
+      with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "travelguideuserapi"
+          heroku_email: "hsaddouki@gmail.com"
