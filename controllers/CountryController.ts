@@ -15,6 +15,7 @@ export const getAllCountries = async( _ = request, res = response ): Promise<voi
             });
         });;
     } catch (error) {
+        console.error(err);
         res.status(401).json({
             message: `Ha sorgit un error al intentar obtenir les els paisos.`
         });
