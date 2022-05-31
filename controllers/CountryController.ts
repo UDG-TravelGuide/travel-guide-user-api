@@ -8,6 +8,7 @@ export const getAllCountries = async( _ = request, res = response ): Promise<voi
             let data = '';
 
             resp.on('data', (chunk) => {
+                console.log('---CHUNK---', chunk);
                 data += chunk;
             });
 
