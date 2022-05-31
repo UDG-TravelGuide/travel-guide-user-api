@@ -7,6 +7,7 @@ import { Paths } from './../config/paths';
 import { UserRouter } from '../routes/UserRouter';
 import { PublicationRouter } from '../routes/PublicationRouter';
 import { FavoritePublicationRouter } from '../routes/FavoritePublicationRouter';
+import { CountryRouter } from '../routes/CountryRouter';
 // MODELS
 import { ImageModel } from './Image';
 import { FavoritePublicationUserModel } from './FavoritePublicationUser';
@@ -65,6 +66,7 @@ export class Server {
         this._app.use( Paths.UsersPath, UserRouter );
         this._app.use( Paths.PublicationsPath, PublicationRouter );
         this._app.use( Paths.FavoritesPath, FavoritePublicationRouter );
+        this._app.use( Paths.CountriesPath, CountryRouter );
     }
 
     private _initDbRelations(): void {
