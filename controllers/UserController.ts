@@ -212,27 +212,33 @@ export const loginUser = async ( req = request, res = response ): Promise<void> 
     const body: UserLogin = req.body;
 
     try {
-        const users = await UserModel.findAll({ where: { email: body.email } });
-        if (users instanceof Array && users.length > 0) {
-            const user: any = users[0];
-            const validPassword: Boolean = await compare(body.password, user.password);
-            if (validPassword) {
-                const token = sign({
-                    name: user.userName,
-                    id: user.id,
-                    role: user.role
-                }, process.env.TOKEN_SECRET);
-                res.status(200).json( { token } );
-            } else {
-                res.status(400).json({
-                    message: `La contrasenya és incorrecta`
+        const user: any = await UserModel.findOne({ where: { email: body.email } });
+
+        if (user instanceof UserModel && user != null) {
+            if (user.blocked) {
+                res.status(405).json({
+                    message: `Aquest usuari no es pot loguejar degut a que està bloquejat`
                 });
+            } else {
+                const validPassword: Boolean = await compare(body.password, user.password);
+                if (validPassword) {
+                    const token = sign({
+                        name: user.userName,
+                        id: user.id,
+                        role: user.role
+                    }, process.env.TOKEN_SECRET);
+                    res.status(200).json( { token } );
+                } else {
+                    res.status(400).json({
+                        message: `La contrasenya és incorrecta`
+                    });
+                }
             }
         } else {
             res.status(400).json({
-                message: `No s'ha trobat el usuari amb email: ${ body.email }`
+                message: `No s'ha trobat el usuari amb el correu: ${ body.email }`
             });
-        } 
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({
