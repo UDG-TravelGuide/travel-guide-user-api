@@ -2,5 +2,6 @@ export enum Paths {
     UsersPath = `/users`,
     PublicationsPath = `/publications`,
     FavoritesPath = `/favorites`,
-    CountriesPath = `/countries`
+    CountriesPath = `/countries`,
+    PointsPath = `/points`
 }

@@ -36,13 +36,13 @@ PublicationRouter.get('/byAuthor/:authorId', [
     verifyToken
 ], getPublicationsByAuthor);
 
-PublicationRouter.put('/edit/:id', [
-    verifyToken
-], editPublication);
-
 PublicationRouter.post('/new', [
     verifyToken
 ], createPublication);
+
+PublicationRouter.put('/edit/:id', [
+    verifyToken
+], editPublication);
 
 PublicationRouter.delete('/delete/:publicationId', [
     verifyToken

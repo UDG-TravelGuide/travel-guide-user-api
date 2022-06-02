@@ -12,10 +12,10 @@ FavoritePublicationRouter.get('/', [
     verifyToken
 ], getFavoritePublicationsOfUser);
 
-FavoritePublicationRouter.post('/add/:publicationId', [
+FavoritePublicationRouter.patch('/add/:publicationId', [
     verifyToken
 ], addFavoritePublication);
 
-FavoritePublicationRouter.post('/remove/:publicationId', [
+FavoritePublicationRouter.patch('/remove/:publicationId', [
     verifyToken
 ], removeFavoritePublication);
