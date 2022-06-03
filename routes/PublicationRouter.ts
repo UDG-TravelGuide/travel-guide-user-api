@@ -10,14 +10,14 @@ import {
     deletePublication,
     getPublicationsForBo,
     editPublication,
-    deletePublicationBo
+    deletePublicationBo,
+    reportPublication
 } from "../controllers/PublicationController";
 
 
 export const PublicationRouter: Router = Router();
 
 PublicationRouter.get('/', [
-    verifyToken
 ], getPublications);
 
 PublicationRouter.get('/backoffice', [
@@ -25,11 +25,9 @@ PublicationRouter.get('/backoffice', [
 ], getPublicationsForBo);
 
 PublicationRouter.get('/:id', [
-    verifyToken
 ], getPublication);
 
 PublicationRouter.get('/byCountry/:country', [
-    verifyToken
 ], getPublicationsByCountry);
 
 PublicationRouter.get('/byAuthor/:authorId', [
@@ -43,6 +41,10 @@ PublicationRouter.post('/new', [
 PublicationRouter.put('/edit/:id', [
     verifyToken
 ], editPublication);
+
+PublicationRouter.patch('/report/:publicationId', [
+    verifyToken
+], reportPublication);
 
 PublicationRouter.delete('/delete/:publicationId', [
     verifyToken

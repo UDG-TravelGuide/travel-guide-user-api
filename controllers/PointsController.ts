@@ -1,3 +1,4 @@
+import { UserModel } from './../models/User';
 import { PublicationModel } from './../models/Publication';
 // Imports
 import { response, request } from 'express';
@@ -22,14 +23,27 @@ export const addPointToPublication = async( req = request, res = response ): Pro
                 });
             } else {
                 const points = Number(publication.points) + 1;
+
                 await PublicationModel.update(
                     {
                         points: points
                     },
-                    { where: { 
-                        id: params.publicationId,
-    
-                    } }
+                    { where: { id: params.publicationId } }
+                );
+
+                const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
+
+                let pointsUser = Number(userBd.points) - 1;
+
+                if (pointsUser < 0) {
+                    pointsUser = 0;
+                }
+
+                await UserModel.update(
+                    {
+                        points: pointsUser
+                    },
+                    { where: { id: publication.authorId } }
                 );
     
                 res.status(200).json({
@@ -76,10 +90,22 @@ export const removePointToPublication = async( req = request, res = response ): 
                     {
                         points: points
                     },
-                    { where: { 
-                        id: params.publicationId,
-    
-                    } }
+                    { where: { id: params.publicationId } }
+                );
+
+                const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
+
+                let pointsUser = Number(userBd.points) - 1;
+
+                if (pointsUser < 0) {
+                    pointsUser = 0;
+                }
+
+                await UserModel.update(
+                    {
+                        points: pointsUser
+                    },
+                    { where: { id: publication.authorId } }
                 );
     
                 res.status(200).json({

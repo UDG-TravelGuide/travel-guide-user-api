@@ -343,6 +343,44 @@ export const createPublication = async( req = request, res = response ): Promise
     }
 }
 
+export const reportPublication = async ( req = request, res = response ): Promise<void> => {
+    const params = req.params;
+
+    try {
+        const user: JWTUser = await getCurrentUserByToken(req, res);
+        const publication: any = await PublicationModel.findOne({ where: { id: params.publicationId } });
+
+        if (publication instanceof PublicationModel && publication != null) {
+            if (publication.authorId == user.id) {
+                res.status(400).json({
+                    message: `L'autor de la publicació no pot reportar la seva propia publicació`
+                });
+            } else {
+                const numReports = Number(publication.numberOfReports) + 1;
+                await PublicationModel.update(
+                    {
+                        numberOfReports: numReports
+                    },
+                    { where: { id: publication.id } }
+                );
+
+                res.status(200).json({
+                    message: `S'ha reportat la publicació correctament`
+                });
+            }
+        } else {
+            res.status(400).json({
+                message: `No s'ha trobat la publicació amb la id: ${ params.publicationId }`
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: `Ha sorgit un error al intentar reportar la publicació amb la id: ${ params.publicationId }`
+        });
+    }
+}
+
 export const deletePublication = async( req = request, res = response ): Promise<void> => {
     const params = req.params;
 
