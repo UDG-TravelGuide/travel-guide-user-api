@@ -170,7 +170,7 @@ export const editPublication = async( req = request, res = response ): Promise<v
             if (actualRoute instanceof RouteModel && publication != null && (updateRoute == null || updateRoute == undefined)) {
                 await DirectionModel.destroy({ where: { routeId: actualRoute.id } });
                 await RouteModel.destroy({ where: { id: actualRoute.id } });
-            } else if (actualRoute instanceof RouteModel && (publication == null || publication == undefined)) {
+            } else if ((actualRoute == null || actualRoute == undefined) && updateRoute != null) {
                 const route: any = await RouteModel.create({
                     latitudeInital: updateRoute.latitudeInitial,
                     longitudeInital: updateRoute.longitudeInitial,
