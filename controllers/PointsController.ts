@@ -6,7 +6,36 @@ import { response, request } from 'express';
 import { JWTUser } from '../interfaces/JWTUser';
 import { getCurrentUserByToken } from './UserController';
 
-export const addPointToPublication = async( req = request, res = response ): Promise<void> => {
+export const userHasGivenPointsToPublication = async ( req = request, res = response ): Promise<void> => {
+    const params = req.params;
+
+    try {
+        const user: JWTUser = await getCurrentUserByToken(req, res);
+        const pointsGiven: any = await UserPublicationPointModel.findOne({
+            where: {
+                publicationId: params.publicationId,
+                userId: user.id
+            }
+        });
+
+        if (pointsGiven instanceof UserPublicationPointModel && pointsGiven != null) {
+            res.status(200).json({
+                ok: true
+            });
+        } else {
+            res.status(200).json({
+                ok: false
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: `Ha sorgit intentar afegir punts a la publicació amb id: ${ params.publicationId }`
+        });
+    }
+}
+
+export const addPointToPublication = async ( req = request, res = response ): Promise<void> => {
     const params = req.params;
 
     try {
@@ -83,7 +112,7 @@ export const addPointToPublication = async( req = request, res = response ): Pro
     }
 }
 
-export const removePointToPublication = async( req = request, res = response ): Promise<void> => {
+export const removePointToPublication = async ( req = request, res = response ): Promise<void> => {
     const params = req.params;
 
     try {
