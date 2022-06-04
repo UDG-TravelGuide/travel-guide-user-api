@@ -1,3 +1,4 @@
+import { UserPublicationPointModel } from './../models/UserPublicationPoint';
 import { UserModel } from './../models/User';
 import { PublicationModel } from './../models/Publication';
 // Imports
@@ -16,44 +17,63 @@ export const addPointToPublication = async( req = request, res = response ): Pro
             } 
         });
 
-        if (publication instanceof PublicationModel && publication != null) {
-            if (publication.authorId == user.id) {
-                res.status(400).json({
-                    message: `L'autor de la publicació no pot afegir punts`
-                });
-            } else {
-                const points = Number(publication.points) + 1;
+        const pointsGiven: any = await UserPublicationPointModel.findOne({
+            where: {
+                publicationId: params.publicationId,
+                userId: user.id
+            }
+        });
 
-                await PublicationModel.update(
-                    {
-                        points: points
-                    },
-                    { where: { id: params.publicationId } }
-                );
+        if (pointsGiven instanceof UserPublicationPointModel && pointsGiven != null) {
+            res.status(400).json({
+                message: `L'usuari no pot donar punts més d'un cop a la mateixa publicació`
+            });
+        } else {
+            if (publication instanceof PublicationModel && publication != null) {
+                if (publication.authorId == user.id) {
+                    res.status(400).json({
+                        message: `L'autor de la publicació no pot afegir punts`
+                    });
+                } else {
+                    const pointsUserPublication: any = await UserPublicationPointModel.create({
+                        publicationId: params.publicationId,
+                        userId: user.id
+                    });
+                    await pointsUserPublication.save();
 
-                const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
-
-                let pointsUser = Number(userBd.points) - 1;
-
-                if (pointsUser < 0) {
-                    pointsUser = 0;
-                }
-
-                await UserModel.update(
-                    {
-                        points: pointsUser
-                    },
-                    { where: { id: publication.authorId } }
-                );
+                    const points = Number(publication.points) + 1;
     
-                res.status(200).json({
-                    message: `S'ha afegit un punt a la publicació correctament`
+                    await PublicationModel.update(
+                        {
+                            points: points
+                        },
+                        { where: { id: params.publicationId } }
+                    );
+    
+                    const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
+    
+                    let pointsUser = Number(userBd.points) - 1;
+    
+                    if (pointsUser < 0) {
+                        pointsUser = 0;
+                    }
+    
+                    await UserModel.update(
+                        {
+                            points: pointsUser
+                        },
+                        { where: { id: publication.authorId } }
+                    );
+        
+                    res.status(200).json({
+                        message: `S'ha afegit un punt a la publicació correctament`
+                    });
+                }
+            } else {
+                res.status(400).json({
+                    message: `No existeix cap publicació amb la id: ${ params.publicationId }`
                 });
             }
-        } else {
-            res.status(400).json({
-                message: `No existeix cap publicació amb la id: ${ params.publicationId }`
-            });
         }
     } catch (error) {
         console.error(error);
@@ -74,47 +94,67 @@ export const removePointToPublication = async( req = request, res = response ): 
             } 
         });
 
-        if (publication instanceof PublicationModel && publication != null) {
-            if (publication.authorId == user.id) {
-                res.status(400).json({
-                    message: `L'autor de la publicació no pot restar punts`
-                });
-            } else {
-                let points = Number(publication.points) - 1;
+        const pointsGiven: any = await UserPublicationPointModel.findOne({
+            where: {
+                publicationId: params.publicationId,
+                userId: user.id
+            }
+        });
 
-                if (points < 0) {
-                    points = 0;
-                }
+        if (pointsGiven instanceof UserPublicationPointModel && pointsGiven != null) {
+            if (publication instanceof PublicationModel && publication != null) {
+                if (publication.authorId == user.id) {
+                    res.status(400).json({
+                        message: `L'autor de la publicació no pot restar punts`
+                    });
+                } else {
+                    await UserPublicationPointModel.destroy({
+                        where: {
+                            publicationId: params.publicationId,
+                            userId: user.id
+                        }
+                    });
 
-                await PublicationModel.update(
-                    {
-                        points: points
-                    },
-                    { where: { id: params.publicationId } }
-                );
-
-                const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
-
-                let pointsUser = Number(userBd.points) - 1;
-
-                if (pointsUser < 0) {
-                    pointsUser = 0;
-                }
-
-                await UserModel.update(
-                    {
-                        points: pointsUser
-                    },
-                    { where: { id: publication.authorId } }
-                );
+                    let points = Number(publication.points) - 1;
     
-                res.status(200).json({
-                    message: `S'ha afegit un punt a la publicació correctament`
+                    if (points < 0) {
+                        points = 0;
+                    }
+    
+                    await PublicationModel.update(
+                        {
+                            points: points
+                        },
+                        { where: { id: params.publicationId } }
+                    );
+    
+                    const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
+    
+                    let pointsUser = Number(userBd.points) - 1;
+    
+                    if (pointsUser < 0) {
+                        pointsUser = 0;
+                    }
+    
+                    await UserModel.update(
+                        {
+                            points: pointsUser
+                        },
+                        { where: { id: publication.authorId } }
+                    );
+        
+                    res.status(200).json({
+                        message: `S'ha afegit un punt a la publicació correctament`
+                    });
+                }
+            } else {
+                res.status(400).json({
+                    message: `No existeix cap publicació amb la id: ${ params.publicationId }`
                 });
             }
         } else {
             res.status(400).json({
-                message: `No existeix cap publicació amb la id: ${ params.publicationId }`
+                message: `Aquest usuari no pot treure punts a aquesta publicació degut a que no li ha donat cap punt en primer lloc.`
             });
         }
     } catch (error) {

@@ -11,12 +11,13 @@ import { CountryRouter } from '../routes/CountryRouter';
 import { PointsRouter } from './../routes/PointsRouter';
 // MODELS
 import { ImageModel } from './Image';
-import { FavoritePublicationUserModel } from './FavoritePublicationUser';
 import { UserModel } from './User';
 import { PublicationModel } from './Publication';
 import { DirectionModel } from './Direction';
 import { ContentModel } from './Content';
 import { RouteModel } from './Route';
+import { FavoritePublicationUserModel } from './FavoritePublicationUser';
+import { UserPublicationPointModel } from './UserPublicationPoint';
 
 export class Server {
     private _app: express.Application;
@@ -79,5 +80,7 @@ export class Server {
         ImageModel.belongsTo(ContentModel, { foreignKey: 'contentId', onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
         PublicationModel.belongsToMany(UserModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
         UserModel.belongsToMany(PublicationModel, { through: FavoritePublicationUserModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        PublicationModel.belongsToMany(UserModel, { through: UserPublicationPointModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
+        UserModel.belongsToMany(PublicationModel, { through: UserPublicationPointModel, onDelete: 'CASCADE', onUpdate: 'CASCADE', hooks: true });
     }
 }

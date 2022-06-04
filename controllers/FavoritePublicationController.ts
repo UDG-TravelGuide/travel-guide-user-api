@@ -10,7 +10,7 @@ import { getCurrentUserByToken } from './UserController';
 import { getAllInfoOfPublication } from './PublicationController';
 import { JWTUser } from '../interfaces/JWTUser';
 
-export const getFavoritePublicationsOfUser = async( req = request, res = response ): Promise<void> => {
+export const getFavoritePublicationsOfUser = async ( req = request, res = response ): Promise<void> => {
     try {
         const user: JWTUser = await getCurrentUserByToken(req, res);
 
@@ -31,13 +31,38 @@ export const getFavoritePublicationsOfUser = async( req = request, res = respons
             res.status(200).json( [] );
         }
     } catch (error) {
+        console.error(error);
         res.status(401).json({
             message: `Ha sorgit un error al intentar obtenir les publicacions favorites, intenta-ho de nou més tard.`
         });
     }
 }
 
-export const addFavoritePublication = async( req = request, res = response ): Promise<void> => {
+export const checkIfUserHasPublicationOnFavorite = async ( req = request, res = response ): Promise<void> => {
+    const params = req.params;
+
+    try {
+        const user: JWTUser = await getCurrentUserByToken(req, res);
+        const favorites: any = await FavoritePublicationUserModel.findOne({ where: { publicationId: params.publicationId ,userId: user.id }  });
+
+        if (favorites instanceof FavoritePublicationUserModel && favorites != null) {
+            res.status(200).json({
+                ok: true
+            });
+        } else {
+            res.status(200).json({
+                ok: false
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: `Ha sorgit un error al intentar comprovar si l'usuari té la publicació a favorits`
+        });
+    }
+}
+
+export const addFavoritePublication = async ( req = request, res = response ): Promise<void> => {
     const params = req.params;
 
     try {
@@ -60,13 +85,14 @@ export const addFavoritePublication = async( req = request, res = response ): Pr
             });
         }
     } catch (error) {
+        console.error(error);
         res.status(401).json({
             message: `Ha sorgit un error al intentar afegir a favorits la publicació amb id: ${ params.publicationId }.`
         });
     }
 }
 
-export const removeFavoritePublication = async( req = request, res = response ): Promise<void> => {
+export const removeFavoritePublication = async ( req = request, res = response ): Promise<void> => {
     const params = req.params;
 
     try {
@@ -88,6 +114,7 @@ export const removeFavoritePublication = async( req = request, res = response ):
             });
         });
     } catch (error) {
+        console.error(error);
         res.status(400).json({
             message: `Ha sorgit un error al intentar esborrar de favorits la publicació amb id: ${ params.publicationId }`
         });
