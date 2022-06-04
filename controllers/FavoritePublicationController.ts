@@ -42,15 +42,23 @@ export const addFavoritePublication = async( req = request, res = response ): Pr
 
     try {
         const user: JWTUser = await getCurrentUserByToken(req, res);
+        const favorite: any = await FavoritePublicationUserModel.findOne({ where: { publicationId: params.publicationId, userId: user.id } });
 
-        const newFavorite: any = {
-            publicationId: params.publicationId,
-            userId: user.id
-        };
-        const favorite: any = await FavoritePublicationUserModel.create(newFavorite);
-        favorite.save();
-
-        res.status(200).json( favorite );
+        if (favorite == null || favorite == undefined) {
+            const newFavorite: any = {
+                publicationId: params.publicationId,
+                userId: user.id
+            };
+            const newData: any = await FavoritePublicationUserModel.create(newFavorite);
+            newData.save();
+            res.status(200).json({
+                message: `S'ha afegit correctament la publicació a favorits`
+            });
+        } else {
+            res.status(400).json({
+                message: `Aquest usuari ja té aquesta publicació en favorits`
+            });
+        }
     } catch (error) {
         res.status(401).json({
             message: `Ha sorgit un error al intentar afegir a favorits la publicació amb id: ${ params.publicationId }.`
