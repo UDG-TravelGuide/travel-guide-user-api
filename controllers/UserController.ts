@@ -151,42 +151,38 @@ export const editUser = async( req = request, res = response ): Promise<void> =>
     const params: any = req.params;
     const body: UserEdit = req.body;
 
-    UserModel.findAll({ where: { id: params.id } })
-    .then(async (user) => {
-        if (user instanceof Array) {
+    const user: any = await UserModel.findOne({ where: { id: params.id } });
+
+    if (user instanceof UserModel && user != null) {
+        let editFields: UserEdit = {
+            userName: body.userName,
+            birthDate: body.birthDate,
+            password: user.password,
+            profilePhoto: body.profilePhoto
+        };
+
+        if (body.password != null) {
             const salt = await genSalt(10);
             const hashedPassword = await hash(body.password, salt);
+            editFields.password = hashedPassword;
+        }
 
-            const editFields: UserEdit = {
-                userName: body.userName,
-                password: hashedPassword,
-                birthDate: body.birthDate,
-                profilePhoto: body.profilePhoto
-            };
-
-            try {
-                user[0].update( editFields, {
-                    where: { id: params.id }
-                });
-                user[0].save();
-                res.status(200).json( user[0] );
-            } catch (error) {
-                res.status(500).json({
-                    message: `Error al editar l'usuari amb id: ${ params.id }`
-                });
-            }
-        } else {
-            res.status(400).json({
-                message: `No s'ha trobat el usuari amb id: ${ params.id }`
+        try {
+            user.update( editFields, {
+                where: { id: params.id }
+            });
+            user.save();
+            res.status(200).json( user );
+        } catch (error) {
+            res.status(500).json({
+                message: `Error al editar l'usuari amb id: ${ params.id }`
             });
         }
-    })
-    .catch(error => {
-        console.error(error);
-        res.status(500).json({
-            message: `Error al obtenir l'usuari amb id: ${ params.id }`
+    } else {
+        res.status(400).json({
+            message: `No s'ha trobat el usuari amb id: ${ params.id }`
         });
-    });
+    }
 }
 
 export const deleteUser = async ( req = request, res = response ): Promise<void> => {
