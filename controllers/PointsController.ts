@@ -144,7 +144,7 @@ export const removePointToPublication = async( req = request, res = response ): 
                     );
         
                     res.status(200).json({
-                        message: `S'ha afegit un punt a la publicació correctament`
+                        message: `S'ha tret un punt a la publicació correctament`
                     });
                 }
             } else {
