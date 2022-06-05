@@ -462,7 +462,7 @@ export const getAllInfoOfPublication = async(publication: any, showBoFields?: bo
             };
 
             if (content.type == 'text') {
-                content.value = content.value;
+                content.value = contents[i].value;
             } else if (content.type == 'image') {
                 const image: any = await ImageModel.findOne({ where: { contentId: content.id } });
                 if (image instanceof ImageModel && image != null) {
