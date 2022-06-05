@@ -279,8 +279,8 @@ export const createPublication = async( req = request, res = response ): Promise
     
         if (body.route) {
             newRoute = {
-                latitudeInital: body.route?.latitudeInitial,
-                longitudeInital: body.route?.longitudeInitial,
+                latitudeInitial: body.route?.latitudeInitial,
+                longitudeInitial: body.route?.longitudeInitial,
                 latitudeFinal: body.route?.latitudeFinal,
                 longitudeFinal: body.route?.longitudeFinal,
                 publicationId: publication.id,
