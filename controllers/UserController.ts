@@ -77,7 +77,8 @@ export const getCurrentUser = async( req = request, res = response ): Promise<vo
         const userBd: any = await UserModel.findOne({ where: { id: user.id } });
         res.json({
             id: user.id,
-            userName: userBd.name,
+            userName: userBd.userName,
+            email: userBd.email,
             birthDate: userBd.birthDate,
             profilePhoto: userBd.profilePhoto,
             points: userBd.points
