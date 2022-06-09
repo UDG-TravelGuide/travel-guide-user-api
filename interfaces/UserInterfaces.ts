@@ -7,7 +7,7 @@ export interface UserCreate {
 
 export interface UserEdit {
     userName: string;
-    password: string;
+    password?: string;
     birthDate?: string;
     profilePhoto?: string;
 }

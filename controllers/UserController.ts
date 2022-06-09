@@ -162,7 +162,6 @@ export const editUser = async( req = request, res = response ): Promise<void> =>
         let editFields: UserEdit = {
             userName: body.userName,
             birthDate: body.birthDate,
-            password: user.password,
             profilePhoto: body.profilePhoto
         };
 
