@@ -74,9 +74,13 @@ export const getCurrentUserByToken = async( req = request, _ = response ): Promi
 export const getCurrentUser = async( req = request, res = response ): Promise<void> => {
     try {
         const user: JWTUser = await getCurrentUserByToken(req, res);
+        const userBd: any = await UserModel.findOne({ where: { id: user.id } });
         res.json({
             id: user.id,
-            userName: user.name
+            userName: userBd.name,
+            birthDate: userBd.birthDate,
+            profilePhoto: userBd.profilePhoto,
+            points: userBd.points
         });
     } catch (error) {
         res.status(500).json({
