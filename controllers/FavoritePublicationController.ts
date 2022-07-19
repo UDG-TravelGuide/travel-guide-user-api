@@ -38,7 +38,7 @@ export const getFavoritePublicationsOfUser = async ( req = request, res = respon
             }
             res.status(200).json({
                 publications,
-                count: favorites.count
+                page: offset
             });
         } else {
             res.status(200).json( [] );
