@@ -13,10 +13,18 @@ import { ContentModel } from '../models/Content';
 import { PublicationModel } from '../models/Publication';
 import { DirectionModel } from '../models/Direction';
 import { ImageModel } from '../models/Image';
+import { getPageAndLimit } from '../helpers/Paginate';
+import { ParamsDictionary } from 'express-serve-static-core';
 
-export const getPublications = async( _ = request, res = response ): Promise<void> => {
+export const getPublications = async( req = request, res = response ): Promise<void> => {
+    const params: ParamsDictionary = req.params;
+
     try {
-        const publications = await PublicationModel.findAll({
+        const { limit, offset } = getPageAndLimit(params);
+
+        const publications = await PublicationModel.findAndCountAll({
+            limit: limit,
+            offset: offset,
             attributes: {
                 exclude: [
                     'numberOfReports'
@@ -24,7 +32,7 @@ export const getPublications = async( _ = request, res = response ): Promise<voi
             }
         });
         if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications); // TODO: Revisar format paginat
             res.json( allPublications );
         } else {
             res.json( [] );
@@ -37,9 +45,16 @@ export const getPublications = async( _ = request, res = response ): Promise<voi
     }
 }
 
-export const getPublicationsForBo = async( _ = request, res = response ): Promise<void> => {
+export const getPublicationsForBo = async( req = request, res = response ): Promise<void> => {
+    const params: ParamsDictionary = req.params;
+
     try {
-        const publications = await PublicationModel.findAll();
+        const { limit, offset } = getPageAndLimit(params);
+
+        const publications = await PublicationModel.findAndCountAll({
+            limit: limit,
+            offset: offset,
+        });
         if (publications instanceof Array && publications.length > 0) {
             const allPublications: Publication[] = await getFullInfoOfPublications(publications, true);
             res.json( allPublications );
@@ -55,10 +70,16 @@ export const getPublicationsForBo = async( _ = request, res = response ): Promis
 }
 
 export const getPublicationsByCountry = async( req = request, res = response ): Promise<void> => {
-    const params = req.params;
+    const params: ParamsDictionary = req.params;
 
     try {
-        const publications: any = await PublicationModel.findAll({ where: { countryAlphaCode: params.country } });
+        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(params);
+
+        const publications: any = await PublicationModel.findAndCountAll({
+            where: { countryAlphaCode: params.country },
+            limit: limit,
+            offset: offset
+        });
         if (publications instanceof Array && publications.length > 0) {
             const allPublications: Publication[] = await getFullInfoOfPublications(publications);
             res.json( allPublications );
@@ -74,10 +95,16 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
 }
 
 export const getPublicationsByAuthor = async( req = request, res = response ): Promise<void> => {
-    const params = req.params;
+    const params: ParamsDictionary = req.params;
 
     try {
-        const publications: any = await PublicationModel.findAll({ where: { authorId: params.authorId } });
+        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(params);
+
+        const publications: any = await PublicationModel.findAndCountAll({ 
+            where: { authorId: params.authorId },
+            limit: limit,
+            offset: offset
+        });
 
         if (publications instanceof Array && publications.length > 0) {
             const allPublications: Publication[] = await getFullInfoOfPublications(publications);

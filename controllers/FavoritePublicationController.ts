@@ -1,3 +1,4 @@
+import { ParamsDictionary } from 'express-serve-static-core';
 // Imports
 import { response, request } from 'express';
 // Interfaces
@@ -9,12 +10,21 @@ import { PublicationModel } from '../models/Publication';
 import { getCurrentUserByToken } from './UserController';
 import { getAllInfoOfPublication } from './PublicationController';
 import { JWTUser } from '../interfaces/JWTUser';
+import { getPageAndLimit } from '../helpers/Paginate';
 
 export const getFavoritePublicationsOfUser = async ( req = request, res = response ): Promise<void> => {
+    const params: ParamsDictionary = req.params;
+
     try {
+        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(params);
+        
         const user: JWTUser = await getCurrentUserByToken(req, res);
 
-        const favorites: any = await FavoritePublicationUserModel.findAll({ where: { userId: user.id }  });
+        const favorites: any = await FavoritePublicationUserModel.findAndCountAll({ 
+            where: { userId: user.id },
+            limit: limit,
+            offset: offset
+        });
         let publications: Publication[] = [];
 
         if (favorites instanceof Array && favorites.length > 0) {

@@ -1,20 +1,37 @@
 import { response, request } from 'express';
 import { hash, genSalt, compare } from 'bcryptjs'
 import { sign } from 'jsonwebtoken';
+// Interfaces
 import { UserCreate, UserEdit, UserLogin } from '../interfaces/UserInterfaces';
-import { UserModel } from '../models/User';
 import { JWTUser } from '../interfaces/JWTUser';
+// Models
+import { UserModel } from '../models/User';
+// Helpers
+import { getPageAndLimit } from '../helpers/Paginate';
+import { LOGGER } from '../helpers/Logger';
 
-export const getUsers = async( _ = request, res = response ): Promise<void> => {
+export const getUsers = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getUsers@UserController -`;
+    LOGGER.info(`${ LOGGER_BASE } init`);
+
+    const params = req.params;
+
     try {
-        const users = await UserModel.findAll();
+        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(params);
+
+        const users = await UserModel.findAndCountAll({
+            limit: limit,
+            offset: offset
+        });
         if (users instanceof Array && users.length > 0) {
             res.json( users );
+            LOGGER.info(`${ LOGGER_BASE } users returned`);
         } else {
             res.json( [] );
+            LOGGER.warn(`${ LOGGER_BASE } users not found`);
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error obtaining users - Error: ${ error }`);
         res.status(500).json({
             message: 'Error al obtenir els usuaris'
         });
@@ -22,11 +39,15 @@ export const getUsers = async( _ = request, res = response ): Promise<void> => {
 }
 
 export const getUser = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getUser@UserController -`;
+    LOGGER.info(`${ LOGGER_BASE } init`);
+
     const params = req.params;
     
     try {
         const user: any = await UserModel.findOne({ where: { id: params.id } });
         if (user instanceof UserModel && user != null) {
+
             const returnUser = {
                 id: user.id,
                 userName: user.userName,
@@ -35,17 +56,26 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
                 profilePhoto: user.profilePhoto,
                 points: user.points
             };
+
             res.json( returnUser );
+
+            LOGGER.info(`${ LOGGER_BASE } user returned`);
+
         } else {
+
             res.status(400).json({
                 message: `No s'ha trobat el usuari amb id: ${ params.id }`
             });
+
+            LOGGER.warn(`${ LOGGER_BASE } not found user with id: ${ params.id }`);
+            
         }
     } catch (error) {
-        console.error(error);
         res.status(500).json({
             message: `Error al obtenir l'usuari amb id: ${ params.id }`
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error obtaining user with id: ${ params.id } - Error: ${ error }`);
     }
 }
 
@@ -114,9 +144,9 @@ export const createUser = async( req = request, res = response ): Promise<void> 
     const body: UserCreate = req.body;
     
     try {
-        const users = await UserModel.findAll({ where: { email: body.email } });
+        const getUser = await UserModel.findOne({ where: { email: body.email } });
 
-        if (users instanceof Array && users.length > 0) {
+        if (getUser instanceof UserModel && getUser != null) {
             res.status(400).json({
                 message: `Aquest correu electrònic ja està registrat`
             });
