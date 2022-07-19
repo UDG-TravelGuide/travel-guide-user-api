@@ -23,8 +23,11 @@ export const getUsers = async( req = request, res = response ): Promise<void> =>
             limit: limit,
             offset: offset
         });
-        if (users instanceof Array && users.length > 0) {
-            res.json( users );
+        if (users.rows instanceof Array && users.rows.length > 0) {
+            res.json({
+                users: users.rows,
+                count: users.count
+            });
             LOGGER.info(`${ LOGGER_BASE } users returned`);
         } else {
             res.json( [] );

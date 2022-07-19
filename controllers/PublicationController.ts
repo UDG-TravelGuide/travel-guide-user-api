@@ -31,9 +31,12 @@ export const getPublications = async( req = request, res = response ): Promise<v
                 ]
             }
         });
-        if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = await getFullInfoOfPublications(publications); // TODO: Revisar format paginat
-            res.json( allPublications );
+        if (publications.rows instanceof Array && publications.rows.length > 0) {
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
+            res.json({
+                publications: allPublications,
+                count: publications.count
+            });
         } else {
             res.json( [] );
         }
@@ -55,9 +58,12 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
             limit: limit,
             offset: offset,
         });
-        if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = await getFullInfoOfPublications(publications, true);
-            res.json( allPublications );
+        if (publications.rows instanceof Array && publications.rows.length > 0) {
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows, true);
+            res.json({
+                publications: allPublications,
+                count: publications.count
+            });
         } else {
             res.json( [] );
         }
@@ -80,9 +86,12 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
             limit: limit,
             offset: offset
         });
-        if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
-            res.json( allPublications );
+        if (publications.rows instanceof Array && publications.rows.length > 0) {
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
+            res.json({
+                publications: allPublications,
+                count: publications.count
+            });
         } else {
             res.status(200).json( [] );
         }
@@ -106,9 +115,12 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
             offset: offset
         });
 
-        if (publications instanceof Array && publications.length > 0) {
-            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
-            res.json( allPublications );
+        if (publications.rows instanceof Array && publications.rows.length > 0) {
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
+            res.json({
+                publications: allPublications,
+                count: publications.count
+            });
         } else {
             res.status(200).json( [] );
         }

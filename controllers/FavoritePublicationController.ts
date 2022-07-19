@@ -27,16 +27,19 @@ export const getFavoritePublicationsOfUser = async ( req = request, res = respon
         });
         let publications: Publication[] = [];
 
-        if (favorites instanceof Array && favorites.length > 0) {
-            for (let i: number = 0; i < favorites.length; i++) {
-                const favorite: any = favorites[i];
+        if (favorites.rows instanceof Array && favorites.rows.length > 0) {
+            for (let i: number = 0; i < favorites.rows.length; i++) {
+                const favorite: any = favorites.rows[i];
                 const publication: any = await PublicationModel.findOne({ where: { id: favorite.publicationId } });
                 if (publication instanceof PublicationModel && publication != null) {
                     const fullPublication: Publication = await getAllInfoOfPublication(publication);
                     publications.push(fullPublication);
                 }
             }
-            res.status(200).json( publications );
+            res.status(200).json({
+                publications,
+                count: favorites.count
+            });
         } else {
             res.status(200).json( [] );
         }
