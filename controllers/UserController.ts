@@ -23,10 +23,15 @@ export const getUsers = async( req = request, res = response ): Promise<void> =>
             limit: limit,
             offset: offset
         });
+
+        const num: number = Math.abs(users.count / 10);
+        const numPages: number = num > 0 ? num : 1;
+
         if (users.rows instanceof Array && users.rows.length > 0) {
             res.json({
                 users: users.rows,
-                page: offset
+                page: offset,
+                pages: numPages
             });
             LOGGER.info(`${ LOGGER_BASE } users returned`);
         } else {

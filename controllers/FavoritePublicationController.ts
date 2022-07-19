@@ -28,6 +28,9 @@ export const getFavoritePublicationsOfUser = async ( req = request, res = respon
         let publications: Publication[] = [];
 
         if (favorites.rows instanceof Array && favorites.rows.length > 0) {
+            const num: number = Math.abs(favorites.count / 10);
+            const numPages: number = num > 0 ? num : 1;
+
             for (let i: number = 0; i < favorites.rows.length; i++) {
                 const favorite: any = favorites.rows[i];
                 const publication: any = await PublicationModel.findOne({ where: { id: favorite.publicationId } });
@@ -38,7 +41,8 @@ export const getFavoritePublicationsOfUser = async ( req = request, res = respon
             }
             res.status(200).json({
                 publications,
-                page: offset
+                page: offset,
+                pages: numPages
             });
         } else {
             res.status(200).json( [] );
