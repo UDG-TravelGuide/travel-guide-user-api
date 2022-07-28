@@ -23,7 +23,7 @@ const getUser = () => {
             },
             password: {
                 type: STRING,
-                allowNull: false
+                allowNull: true
             },
             birthDate: {
                 type: STRING,

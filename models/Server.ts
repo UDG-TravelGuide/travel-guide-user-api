@@ -9,6 +9,7 @@ import { PublicationRouter } from '../routes/PublicationRouter';
 import { FavoritePublicationRouter } from '../routes/FavoritePublicationRouter';
 import { CountryRouter } from '../routes/CountryRouter';
 import { PointsRouter } from './../routes/PointsRouter';
+import { AuthRouter } from './../routes/AuthRouter';
 // MODELS
 import { ImageModel } from './Image';
 import { UserModel } from './User';
@@ -70,6 +71,7 @@ export class Server {
         this._app.use( Paths.FavoritesPath, FavoritePublicationRouter );
         this._app.use( Paths.CountriesPath, CountryRouter );
         this._app.use( Paths.PointsPath, PointsRouter );
+        this._app.use( Paths.AuthPath,  AuthRouter );
     }
 
     private _initDbRelations(): void {

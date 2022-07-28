@@ -3,5 +3,6 @@ export enum Paths {
     PublicationsPath = `/publications`,
     FavoritesPath = `/favorites`,
     CountriesPath = `/countries`,
-    PointsPath = `/points`
+    PointsPath = `/points`,
+    AuthPath = `/auth`
 }

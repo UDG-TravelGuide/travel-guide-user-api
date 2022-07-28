@@ -10,6 +10,10 @@ import { UserModel } from '../models/User';
 import { getPageAndLimit } from '../helpers/Paginate';
 import { LOGGER } from '../helpers/Logger';
 
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 export const getUsers = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getUsers@UserController -`;
     LOGGER.info(`${ LOGGER_BASE } init`);
