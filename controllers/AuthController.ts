@@ -53,12 +53,12 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
     const { email } = req.query;
 
     try {
-        // TODO: Send mail
-
         if (email != null && email != undefined) {
             let user: any = await UserModel.findOne({ where: { email: email } });
 
             if (user != null && user != undefined) {
+
+                console.log(`User found`);
 
                 const transporter = createTransport({
                     host: process.env.MAIL_HOST,
@@ -68,8 +68,10 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                         pass: process.env.MAIL_PASSWORD
                     }
                 });
+
+                console.log(`Transporter created`, process.env.MAIL_HOST, process.env.MAIL_PORT, process.env.MAIL_USER, process.env.MAIL_PASSWORD);
             
-                const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
+                await transporter.sendMail({
                     from: '"Travel Guide 🗺️" <recover@travelguide.com>', // sender address
                     to: `${ email }`, // list of receivers
                     subject: "Recuperar contrasenya", // Subject line
@@ -77,9 +79,17 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                     html: "<b>Hello world?</b>" // html body
                 });
 
+                console.log(`Mail sent`);
+
+            } else {
+
+                console.log(`User not found`);
+
             }
 
-        } // TODO: Validador de mail
+        } else {
+            console.log(`Email null or undefined`);
+        }
         
     } catch (error) {
         res.status(401).json({
