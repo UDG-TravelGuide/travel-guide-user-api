@@ -12,7 +12,6 @@ import { LOGGER } from '../helpers/Logger';
 
 export const getUsers = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getUsers@UserController -`;
-    LOGGER.info(`${ LOGGER_BASE } init`);
 
     const params = req.params;
 
@@ -39,10 +38,11 @@ export const getUsers = async( req = request, res = response ): Promise<void> =>
             LOGGER.warn(`${ LOGGER_BASE } users not found`);
         }
     } catch (error) {
-        LOGGER.error(`${ LOGGER_BASE } error obtaining users - Error: ${ error }`);
         res.status(500).json({
             message: 'Error al obtenir els usuaris'
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error obtaining users - Error: ${ error }`);
     }
 }
 
@@ -67,23 +67,23 @@ export const getUser = async( req = request, res = response ): Promise<void> => 
 
             res.json( returnUser );
 
-            LOGGER.info(`${ LOGGER_BASE } user returned`);
+            LOGGER.info(`${ LOGGER_BASE } returned user with id: '${ user.id }'`);
 
         } else {
 
             res.status(400).json({
-                message: `No s'ha trobat el usuari amb id: ${ params.id }`
+                message: `No s'ha trobat el usuari amb id: '${ params.id }'`
             });
 
-            LOGGER.warn(`${ LOGGER_BASE } not found user with id: ${ params.id }`);
+            LOGGER.warn(`${ LOGGER_BASE } not found user with id: '${ params.id }'`);
             
         }
     } catch (error) {
         res.status(500).json({
-            message: `Error al obtenir l'usuari amb id: ${ params.id }`
+            message: `Error al obtenir l'usuari amb id: '${ params.id }'`
         });
 
-        LOGGER.error(`${ LOGGER_BASE } error obtaining user with id: ${ params.id } - Error: ${ error }`);
+        LOGGER.error(`${ LOGGER_BASE } error obtaining user with id: '${ params.id }' - Error: ${ error }`);
     }
 }
 
@@ -98,18 +98,16 @@ export const getCurrentUserByToken = async( req = request, _ = response ): Promi
         token = bearerHeader;
     }
 
-    try {
-        let splitToken = token.split('.');
-        let toPayload = splitToken[1];
-        const payload = atob(toPayload);
-        const user: JWTUser = JSON.parse(payload);
-        return user;
-    } catch (error) {
-        return error;
-    }
+    let splitToken = token.split('.');
+    let toPayload = splitToken[1];
+    const payload = atob(toPayload);
+    const user: JWTUser = JSON.parse(payload);
+    return user;
 }
 
 export const getCurrentUser = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getCurrentUser@UserController -`;
+    
     try {
         const user: JWTUser = await getCurrentUserByToken(req, res);
         const userBd: any = await UserModel.findOne({ where: { id: user.id } });
@@ -125,10 +123,14 @@ export const getCurrentUser = async( req = request, res = response ): Promise<vo
         res.status(500).json({
             message: "S'ha produit un error al obtenir l'usuari actual"
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error obtaining user - Error: ${ error }`);
     }
 }
 
 export const getRefreshToken = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getRefreshToken@UserController -`;
+
     try {
         const user: JWTUser = await getCurrentUserByToken(req, res);
         const getUser: any = await UserModel.findOne({ where: { id: user.id } });
@@ -145,10 +147,14 @@ export const getRefreshToken = async( req = request, res = response ): Promise<v
         res.status(500).json({
             message: "S'ha produit un error al intentar comprovar el token"
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error getting refresh token - Error: ${ error }`);
     }
 }
 
 export const createUser = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `createUser@UserController -`;
+
     const body: UserCreate = req.body;
     
     try {
@@ -158,6 +164,8 @@ export const createUser = async( req = request, res = response ): Promise<void> 
             res.status(400).json({
                 message: `Aquest correu electrònic ja està registrat`
             });
+
+            LOGGER.warn(`${ LOGGER_BASE } can't create user because this email exists in database: '${ body.email }'`);
         } else {
             const salt = await genSalt(10);
             const hashedPassword = await hash(body.password, salt);
@@ -181,16 +189,21 @@ export const createUser = async( req = request, res = response ): Promise<void> 
                 user: user,
                 token: token
             });
+
+            LOGGER.info(`${ LOGGER_BASE } created user with email: '${ body.email }'`);
         }
     } catch (error) {
-        console.error(error);
         res.status(500).json({
             message: `Error al crear l'usuari nou`
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error creating user - Error: ${ error } `)
     }
 }
 
 export const editUser = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `editUser@UserController -`;
+
     const params: any = req.params;
     const body: UserEdit = req.body;
 
@@ -215,19 +228,27 @@ export const editUser = async( req = request, res = response ): Promise<void> =>
             });
             user.save();
             res.status(200).json( user );
+
+            LOGGER.info(`${ LOGGER_BASE } user with id: '${ params.id }' updated succesfully`);
         } catch (error) {
             res.status(500).json({
-                message: `Error al editar l'usuari amb id: ${ params.id }`
+                message: `Error al editar l'usuari amb id: '${ params.id }'`
             });
+
+            LOGGER.error(`${ LOGGER_BASE } error updating user with id: '${ params.id }' - Error: ${ error }`);
         }
     } else {
         res.status(400).json({
-            message: `No s'ha trobat el usuari amb id: ${ params.id }`
+            message: `No s'ha trobat el usuari amb id: '${ params.id }'`
         });
+
+        LOGGER.warn(`${ LOGGER_BASE } user with id: '${ params.id }' not found`);
     }
 }
 
 export const deleteUser = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `deleteUser@UserController -`;
+
     const params: any = req.params;
 
     UserModel.destroy({
@@ -238,15 +259,20 @@ export const deleteUser = async ( req = request, res = response ): Promise<void>
         res.status(200).json({
             message: `S'ha eliminat correctament l'usuari`
         });
+
+        LOGGER.info(`${ LOGGER_BASE } deleted user with id: '${ params.id }'`);
     }).catch(error => {
-        console.error(error);
         res.status(500).json({
-            message: `Error al eliminar l'usuari amb id: ${ params.id }`
+            message: `Error al eliminar l'usuari amb id: '${ params.id }'`
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error deleting user with id: '${ params.id }' - Error: ${ error }`);
     });
 }
 
 export const loginUser = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `deleteUser@UserController -`;
+
     const body: UserLogin = req.body;
 
     try {
@@ -257,6 +283,8 @@ export const loginUser = async ( req = request, res = response ): Promise<void> 
                 res.status(405).json({
                     message: `Aquest usuari no es pot loguejar degut a que està bloquejat`
                 });
+
+                LOGGER.warn(`${ LOGGER_BASE } user with email: '${ body.email }' can't login because has a blocked account`);
             } else {
                 const validPassword: Boolean = await compare(body.password, user.password);
                 if (validPassword) {
@@ -266,26 +294,35 @@ export const loginUser = async ( req = request, res = response ): Promise<void> 
                         role: user.role
                     }, process.env.TOKEN_SECRET);
                     res.status(200).json( { token } );
+
+                    LOGGER.info(`${ LOGGER_BASE } user with email: '${ body.email }' and id: '${ user.id }' logged succesfully`);
                 } else {
                     res.status(400).json({
                         message: `La contrasenya és incorrecta`
                     });
+
+                    LOGGER.warn(`${ LOGGER_BASE } user with email: '${ body.email }' and id: '${ user.id }' can't login because the password is wrong`);
                 }
             }
         } else {
             res.status(400).json({
-                message: `No s'ha trobat el usuari amb el correu: ${ body.email }`
+                message: `No s'ha trobat el usuari amb el correu: '${ body.email }'`
             });
+
+            LOGGER.warn(`${ LOGGER_BASE } user with email: '${ body.email }' not found`);
         }
     } catch (error) {
-        console.error(error);
         res.status(500).json({
             message: `Error al realitzar el login`
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error on doing login with email: '${ body.email }' - Error: ${ error }`);
     }
 }
 
 export const blockUser = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `blockUser@UserController -`;
+
     const params: any = req.params;
 
     UserModel.update(
@@ -297,15 +334,20 @@ export const blockUser = async ( req = request, res = response ): Promise<void> 
         res.status(200).json({
             message: `S'ha bloquejat correctament l'usuari`
         });
+
+        LOGGER.info(`${ LOGGER_BASE } user with id: '${ params.id }' blocked succesfully`);
     }).catch(error => {
-        console.error(error);
         res.status(500).json({
             message: `Error al bloquejar l'usuari amb id: ${ params.id }`
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error blocking user with id: '${ params.id }' - Error: ${ error }`);
     });
 }
 
 export const unblockUser = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `unblockUser@UserController -`;
+
     const params: any = req.params;
 
     UserModel.update(
@@ -317,15 +359,20 @@ export const unblockUser = async ( req = request, res = response ): Promise<void
         res.status(200).json({
             message: `S'ha desbloquejat correctament l'usuari`
         });
+
+        LOGGER.info(`${ LOGGER_BASE } user with id: '${ params.id }' unblocked succesfully`);
     }).catch(error => {
-        console.error(error);
         res.status(500).json({
             message: `Error al desbloquejar l'usuari amb id: ${ params.id }`
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error unblocking user with id: '${ params.id }' - Error: ${ error }`);
     });
 }
 
 export const changeRole = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `changeRole@UserController -`;
+
     const params: any = req.params;
     const body = req.body;
 
@@ -338,10 +385,13 @@ export const changeRole = async ( req = request, res = response ): Promise<void>
         res.status(200).json({
             message: `S'ha canviar correctament el rol de l'usuari`
         });
+
+        LOGGER.info(`${ LOGGER_BASE } changed role of user with id: '${ params.id }' succesfully`);
     }).catch(error => {
-        console.error(error);
         res.status(500).json({
             message: `Error al canviar el rol de l'usuari amb id: ${ params.id }`
         });
+
+        LOGGER.error(`${ LOGGER_BASE } error changing the role for user with id: '${ params.id }' - Error: ${ error }`);
     });
 }

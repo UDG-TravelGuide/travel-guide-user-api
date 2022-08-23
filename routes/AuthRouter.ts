@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { loginUserGoogle } from '../controllers/AuthController';
+import { loginUserGoogle, recoverPassword } from '../controllers/AuthController';
 
 export const AuthRouter: Router = Router();
 
 AuthRouter.post('/google', [
 
 ], loginUserGoogle);
+
+AuthRouter.post('/recoverPassword', [
+    
+], recoverPassword);
