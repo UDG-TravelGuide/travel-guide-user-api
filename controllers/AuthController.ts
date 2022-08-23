@@ -58,8 +58,6 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
 
             if (user != null && user != undefined) {
 
-                console.log(`User found`);
-
                 const transporter = createTransport({
                     host: process.env.MAIL_HOST,
                     port: Number(process.env.MAIL_PORT),
@@ -68,8 +66,6 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                         pass: process.env.MAIL_PASSWORD
                     }
                 });
-
-                console.log(`Transporter created`, process.env.MAIL_HOST, process.env.MAIL_PORT, process.env.MAIL_USER, process.env.MAIL_PASSWORD);
             
                 await transporter.sendMail({
                     from: '"Travel Guide 🗺️" <recover@travelguide.com>', // sender address
@@ -79,16 +75,9 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                     html: "<b>Hello world?</b>" // html body
                 });
 
-                console.log(`Mail sent`);
-
-            } else {
-
-                console.log(`User not found`);
-
+                LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }`);
             }
 
-        } else {
-            console.log(`Email null or undefined`);
         }
         
     } catch (error) {
@@ -96,6 +85,6 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
             message: `Ha sorgit un error al recordar la contrasenya`
         });
 
-        LOGGER.error(`${ LOGGER_BASE } error trying to remember password for user with email: '${ email }'`);
+        LOGGER.error(`${ LOGGER_BASE } error trying to remember password for user with email: '${ email }' - Error: ${ error }`);
     }
 }
