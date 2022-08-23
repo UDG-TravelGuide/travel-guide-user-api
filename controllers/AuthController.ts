@@ -64,8 +64,8 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                     host: process.env.MAIL_HOST,
                     port: Number(process.env.MAIL_PORT),
                     auth: {
-                        user: process.env.MAIL_HOST,
-                        pass: process.env.MAIL_HOST
+                        user: process.env.MAIL_USER,
+                        pass: process.env.MAIL_PASSWORD
                     }
                 });
             
