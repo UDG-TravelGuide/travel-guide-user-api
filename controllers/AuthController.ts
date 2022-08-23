@@ -76,6 +76,10 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                 });
 
                 LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }`);
+
+                res.status(200).json({
+                    message: `S'ha enviat el mail de recuperació de contrasenya correctament`
+                });
             }
 
         }
