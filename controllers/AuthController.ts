@@ -1,7 +1,7 @@
 import { response, request } from 'express';
 import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
 import { createTransport } from 'nodemailer';
-import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import sgTransport from 'nodemailer-sendgrid-transport';
 // Models
 import { UserModel } from '../models/User';
 // Helpers
@@ -58,19 +58,18 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
 
             if (user != null && user != undefined) {
 
-                const transporter = createTransport({
-                    service: 'gmail',
+                const transporter = createTransport(sgTransport({
                     auth: {
-                        user: process.env.MAIL_USER,
-                        pass: process.env.MAIL_PASSWORD
+                        api_key: process.env.ADMIN_EMAIL_API_KEY
                     }
-                });
+                }));
             
                 transporter.sendMail({
-                    from: `${ process.env.MAIL_USER }`,
+                    from: `"Travel Guide 🗺️" <${ process.env.MAIL_USER }>`,
                     to: `${ email }`, // list of receivers
+                    replyTo: process.env.MAIL_USER,
                     subject: "Recuperar contrasenya", // Subject line
-                    text: `Test Mail`, // plain text body
+                    html: `Test mail`
                 }, (error, info) => {
                     if (error) {
                         LOGGER.error(`${ LOGGER_BASE } an error ocurred on sending mail to '${ email }' - Error: ${ error }`);
