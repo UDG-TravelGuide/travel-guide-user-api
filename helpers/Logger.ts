@@ -2,8 +2,8 @@ import { createLogger, transports, format } from 'winston';
 
 const { combine, timestamp, printf } = format;
 
-const logFormat = printf(({ level, message, label, timestamp }) => {
-    return `${ timestamp } [${ label }] ${ level }: ${ message }`;
+const logFormat = printf(({ level, message, _, timestamp }) => {
+    return `${ timestamp } [${ level }]: ${ message }`;
 });
 
 export const LOGGER = createLogger({
