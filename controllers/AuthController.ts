@@ -59,28 +59,30 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
             if (user != null && user != undefined) {
 
                 const transporter = createTransport({
-                    host: process.env.MAIL_HOST,
-                    port: Number(process.env.MAIL_PORT),
-                    secure: true,
+                    service: 'gmail',
                     auth: {
                         user: process.env.MAIL_USER,
                         pass: process.env.MAIL_PASSWORD
                     }
                 });
             
-                await transporter.sendMail({
+                transporter.sendMail({
+                    from: `${ process.env.MAIL_USER }`,
                     to: `${ email }`, // list of receivers
                     subject: "Recuperar contrasenya", // Subject line
                     text: `Test Mail`, // plain text body
                 }, (error, info) => {
                     if (error) {
-                        return LOGGER.error(`${ LOGGER_BASE } an error ocurred on sending mail to '${ email }' - Error: ${ error }`);
+                        LOGGER.error(`${ LOGGER_BASE } an error ocurred on sending mail to '${ email }' - Error: ${ error }`);
+                        res.status(400).json({
+                            message: `Ha sorgit un error al intentar enviar un correu de recuperació de contrasenya`
+                        });
                     }
-                    LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }, ${ info }`);
-                });
 
-                res.status(200).json({
-                    message: `S'ha enviat el mail de recuperació de contrasenya correctament`
+                    LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }, ${ info }`);
+                    res.status(200).json({
+                        message: `S'ha enviat el mail de recuperació de contrasenya correctament`
+                    });
                 });
             }
 
