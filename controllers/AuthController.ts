@@ -77,12 +77,12 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                         res.status(400).json({
                             message: `Ha sorgit un error al intentar enviar un correu de recuperació de contrasenya`
                         });
+                    } else {
+                        LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }, ${ info }`);
+                        res.status(200).json({
+                            message: `S'ha enviat el mail de recuperació de contrasenya correctament`
+                        });
                     }
-
-                    LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }, ${ info }`);
-                    res.status(200).json({
-                        message: `S'ha enviat el mail de recuperació de contrasenya correctament`
-                    });
                 });
             }
 
