@@ -163,6 +163,19 @@ export const newPassword = async ( req = request, res = response ): Promise<void
                 }
             );
             await user.save();
+            
+            recover.update(
+                {
+                    used: 1
+                },
+                {
+                    where: {
+                        id: recover.id
+                    }
+                }
+            );
+            await recover.save();
+
             res.status(200).json({
                 message: `S'ha canviat la contrasenya per una nova correctament`
             });

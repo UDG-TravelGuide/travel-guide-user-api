@@ -271,7 +271,7 @@ export const deleteUser = async ( req = request, res = response ): Promise<void>
 }
 
 export const loginUser = async ( req = request, res = response ): Promise<void> => {
-    const LOGGER_BASE = `deleteUser@UserController -`;
+    const LOGGER_BASE = `loginUser@UserController -`;
 
     const body: UserLogin = req.body;
 
