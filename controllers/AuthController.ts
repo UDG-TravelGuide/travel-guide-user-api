@@ -2,6 +2,7 @@ import { response, request } from 'express';
 import { LoginTicket, OAuth2Client, TokenPayload } from 'google-auth-library';
 import { createTransport } from 'nodemailer';
 import { randomBytes } from 'crypto';
+import { hash, genSalt } from 'bcryptjs';
 import sgTransport from 'nodemailer-sendgrid-transport';
 // Models
 import { UserModel } from '../models/User';
@@ -113,5 +114,68 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
         });
 
         LOGGER.error(`${ LOGGER_BASE } error trying to remember password for user with email: '${ email }' - Error: ${ error }`);
+    }
+}
+
+export const newPassword = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `newPassword@AuthController -`;
+
+    const { token } = req.query;
+    const { password } = req.body;
+
+    try {
+
+        const recover: any = await RecoverModel.findOne({ 
+            where: { 
+                token: token,
+                used: 0
+            } 
+        });
+
+        if (recover == null || recover == undefined) {
+            LOGGER.warn(`${ LOGGER_BASE } can't find a recover with token: ${ token }`);
+
+            res.status(400).json({
+                message: `S'ha produit un error al intentar canviar la contrasenya`
+            });
+
+            return;
+        }
+
+        const user: any = await UserModel.findOne({
+            where: {
+                id: recover.userId
+            }
+        });
+
+        const salt = await genSalt(10);
+        const hashedPassword = await hash(password, salt);
+
+        if (user instanceof UserModel && user != null) {
+            user.update(
+                {
+                    password: hashedPassword
+                }
+            );
+            await user.save();
+            res.status(200).json({
+                message: `S'ha canviat la contrasenya per una nova correctament`
+            });
+
+            LOGGER.info(`${ LOGGER_BASE } user with id: '${ user.id }' changed the password succesfully`);
+        } else {
+            LOGGER.warn(`${ LOGGER_BASE } not found user with id: '${ recover.userId }'`);
+
+            res.status(400).json({
+                message: `S'ha produit un error al intentar canviar la contrasenya`
+            });
+        }
+
+    } catch(error) {
+        res.status(500).json({
+            message: `Error al canviar la contrasenya`
+        });
+
+        LOGGER.error(`${ LOGGER_BASE } error changing the password for token: ${ token } - Error: ${ error }`);
     }
 }

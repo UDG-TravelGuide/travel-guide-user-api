@@ -1,5 +1,5 @@
 import { response, request } from 'express';
-import { hash, genSalt, compare } from 'bcryptjs'
+import { hash, genSalt, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 // Interfaces
 import { UserCreate, UserEdit, UserLogin } from '../interfaces/UserInterfaces';
@@ -226,7 +226,7 @@ export const editUser = async( req = request, res = response ): Promise<void> =>
             user.update( editFields, {
                 where: { id: params.id }
             });
-            user.save();
+            await user.save();
             res.status(200).json( user );
 
             LOGGER.info(`${ LOGGER_BASE } user with id: '${ params.id }' updated succesfully`);
