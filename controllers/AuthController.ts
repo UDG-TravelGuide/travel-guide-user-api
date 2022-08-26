@@ -148,13 +148,21 @@ export const newPassword = async ( req = request, res = response ): Promise<void
             }
         });
 
+        LOGGER.info(`${ LOGGER_BASE } password: '${ password }'`);
         const salt = await genSalt(10);
+        LOGGER.info(`${ LOGGER_BASE } salt ${ salt }`);
         const hashedPassword = await hash(password, salt);
+        LOGGER.info(`${ LOGGER_BASE } hashedPassword: '${ hashedPassword }'`)
 
         if (user instanceof UserModel && user != null) {
             user.update(
                 {
                     password: hashedPassword
+                },
+                {
+                    where: {
+                        id: recover.userId
+                    }
                 }
             );
             await user.save();
