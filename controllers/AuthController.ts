@@ -121,7 +121,7 @@ export const newPassword = async ( req = request, res = response ): Promise<void
     const LOGGER_BASE = `newPassword@AuthController -`;
 
     const { token } = req.query;
-    const { password } = req.body;
+    const body = req.body;
 
     try {
 
@@ -148,11 +148,8 @@ export const newPassword = async ( req = request, res = response ): Promise<void
             }
         });
 
-        LOGGER.info(`${ LOGGER_BASE } password: '${ password }'`);
         const salt = await genSalt(10);
-        LOGGER.info(`${ LOGGER_BASE } salt ${ salt }`);
-        const hashedPassword = await hash(password, salt);
-        LOGGER.info(`${ LOGGER_BASE } hashedPassword: '${ hashedPassword }'`)
+        const hashedPassword = await hash(body.password, salt);
 
         if (user instanceof UserModel && user != null) {
             user.update(
