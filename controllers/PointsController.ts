@@ -5,8 +5,12 @@ import { PublicationModel } from './../models/Publication';
 import { response, request } from 'express';
 import { JWTUser } from '../interfaces/JWTUser';
 import { getCurrentUserByToken } from './UserController';
+// Helpers
+import { LOGGER } from '../helpers/Logger';
 
 export const userHasGivenPointsToPublication = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `userHasGivenPointsToPublication@PointsController -`;
+
     const params = req.params;
 
     try {
@@ -28,14 +32,21 @@ export const userHasGivenPointsToPublication = async ( req = request, res = resp
             });
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error getting information about the points given in the publication: '${ params.publicationId }' - Error: ${ error }`);
+
         res.status(500).json({
-            message: `Ha sorgit intentar afegir punts a la publicació amb id: ${ params.publicationId }`
+            message: {
+                cat: `Ha sorgit intentar afegir punts a la publicació amb id: ${ params.publicationId }`,
+                es: `Surgió intentar añadir puntos a la publicación con id: ${ params.publicationId }`,
+                eng: `An error ocurred while trying to add points to publication with id: ${ params.publicationId }`
+            }
         });
     }
 }
 
 export const addPointToPublication = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `addPointToPublication@PointsController -`;
+
     const params = req.params;
 
     try {
@@ -61,7 +72,11 @@ export const addPointToPublication = async ( req = request, res = response ): Pr
             if (publication instanceof PublicationModel && publication != null) {
                 if (publication.authorId == user.id) {
                     res.status(400).json({
-                        message: `L'autor de la publicació no pot afegir punts`
+                        message: {
+                            cat: `L'autor de la publicació no pot afegir punts`,
+                            es: `El autor de la publicación no puede añadir puntos`,
+                            eng: `The author of the post cannot add points`
+                        }
                     });
                 } else {
                     const pointsUserPublication: any = await UserPublicationPointModel.create({
@@ -95,24 +110,39 @@ export const addPointToPublication = async ( req = request, res = response ): Pr
                     );
         
                     res.status(200).json({
-                        message: `S'ha afegit un punt a la publicació correctament`
+                        message: {
+                            cat: `S'ha afegit un punt a la publicació correctament`,
+                            es: `Se ha añadido un punto a la publicación correctamente`,
+                            eng: `A point has been added to the post successfully`
+                        }
                     });
                 }
             } else {
                 res.status(400).json({
-                    message: `No existeix cap publicació amb la id: ${ params.publicationId }`
+                    message: {
+                        cat: `No existeix cap publicació amb la id: ${ params.publicationId }`,
+                        es: `No existe ninguna publicación con la id: ${ params.publicationId }`,
+                        eng: `No post exists with id: ${ params.publicationId }`
+                    }
                 });
             }
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error trying to add points to publication: '${ params.publicationId }' - Error: ${ error }`);
+
         res.status(500).json({
-            message: `Ha sorgit intentar afegir punts a la publicació amb id: ${ params.publicationId }`
+            message: {
+                cat: `Ha sorgit intentar afegir punts a la publicació amb id: ${ params.publicationId }`,
+                es: `Surgió intentar añadir puntos a la publicación con id: ${ params.publicationId }`,
+                eng: `An error ocurred while trying to add points to publication with id: ${ params.publicationId }`
+            }
         });
     }
 }
 
 export const removePointToPublication = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `addPointToPublication@PointsController -`;
+
     const params = req.params;
 
     try {
@@ -173,23 +203,40 @@ export const removePointToPublication = async ( req = request, res = response ):
                     );
         
                     res.status(200).json({
-                        message: `S'ha tret un punt a la publicació correctament`
+                        message: {
+                            cat: `S'ha tret un punt a la publicació correctament`,
+                            es: `Se ha quitado un punto a la publicación correctamente`,
+                            eng: `Correctly removed a point from the post`
+                        }
                     });
                 }
             } else {
                 res.status(400).json({
-                    message: `No existeix cap publicació amb la id: ${ params.publicationId }`
+                    message: {
+                        cat: `No existeix cap publicació amb la id: ${ params.publicationId }`,
+                        es: `No existe ninguna publicación con la id: ${ params.publicationId }`,
+                        eng: `No publication exists with id: ${ params.publicationId }`
+                    }
                 });
             }
         } else {
             res.status(400).json({
-                message: `Aquest usuari no pot treure punts a aquesta publicació degut a que no li ha donat cap punt en primer lloc.`
+                message: {
+                    cat: `Aquest usuari no pot treure punts a aquesta publicació degut a que no li ha donat cap punt en primer lloc.`,
+                    es: `Este usuario no puede quitar puntos a esta publicación debido a que no le ha dado ningún punto en primer lugar.`,
+                    eng: `This user can't take points off this post because they didn't give it any points in the first place.`
+                }
             });
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error trying to remove points to publication: '${ params.publicationId }' - Error: ${ error }`);
+
         res.status(500).json({
-            message: `Ha sorgit intentar restar punts a la publicació amb id: ${ params.publicationId }`
+            message: {
+                cat: `Ha sorgit intentar restar punts a la publicació amb id: ${ params.publicationId }`,
+                es: `Surgió intentar restar puntos a la publicación con id: ${ params.publicationId }`,
+                eng: `Attempting to subtract points from publication with id: ${ params.publicationId } occurred`
+            }
         });
     }
 }

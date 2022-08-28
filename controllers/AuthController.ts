@@ -43,7 +43,11 @@ export const loginUserGoogle = async ( req = request, res = response ): Promise<
         LOGGER.info(`${ LOGGER_BASE } user with email: '${ payload?.email }' logged with google succesfully`);
     } catch (error) {
         res.status(401).json({
-            message: `Ha sorgit un intentar fer login ambel compte de google`
+            message: {
+                cat: `Ha sorgit un intentar fer login amb el compte de google`,
+                es: `Ha surgido un intentar hacer login con la cuenta de google`,
+                eng: `An attempt to login with the google account has appeared`
+            }
         });
 
         LOGGER.error(`${ LOGGER_BASE } error logging with google with email: '${ payload?.email }' - Error: ${ error }`);
@@ -93,13 +97,23 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                     }, (error, info) => {
                         if (error) {
                             LOGGER.error(`${ LOGGER_BASE } an error ocurred on sending mail to '${ email }' - Error: ${ error }`);
+
                             res.status(400).json({
-                                message: `Ha sorgit un error al intentar enviar un correu de recuperació de contrasenya`
+                                message: {
+                                    cat: `Ha sorgit un error al intentar enviar un correu de recuperació de contrasenya`,
+                                    es: `Surgió un error al intentar enviar un correo de recuperación de contraseña`,
+                                    eng: `An error occurred while trying to send a password recovery email`
+                                }
                             });
                         } else {
                             LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }`);
+
                             res.status(200).json({
-                                message: `S'ha enviat el mail de recuperació de contrasenya correctament`
+                                message: {
+                                    cat: `S'ha enviat el mail de recuperació de contrasenya correctament`,
+                                    es: `El mail de recuperación de contraseña se ha enviado correctamente`,
+                                    eng: `The password recovery email has been sent successfully`
+                                }
                             });
                         }
                     });
@@ -110,7 +124,11 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
         
     } catch (error) {
         res.status(401).json({
-            message: `Ha sorgit un error al recordar la contrasenya`
+            message: {
+                cat: `Ha sorgit un error al recordar la contrasenya`,
+                es: `Surgió un error al recordar la contraseña`,
+                eng: `An error occurred while remembering the password`
+            }
         });
 
         LOGGER.error(`${ LOGGER_BASE } error trying to remember password for user with email: '${ email }' - Error: ${ error }`);
@@ -177,7 +195,11 @@ export const newPassword = async ( req = request, res = response ): Promise<void
             await recover.save();
 
             res.status(200).json({
-                message: `S'ha canviat la contrasenya per una nova correctament`
+                message: {
+                    cat: `S'ha canviat la contrasenya per una nova correctament`,
+                    es: `Surgió un error al recordar la contraseña`,
+                    eng: `An error occurred while remembering the password`
+                }
             });
 
             LOGGER.info(`${ LOGGER_BASE } user with id: '${ user.id }' changed the password succesfully`);
@@ -185,13 +207,21 @@ export const newPassword = async ( req = request, res = response ): Promise<void
             LOGGER.warn(`${ LOGGER_BASE } not found user with id: '${ recover.userId }'`);
 
             res.status(400).json({
-                message: `S'ha produit un error al intentar canviar la contrasenya`
+                message: {
+                    cat: `S'ha produit un error al intentar canviar la contrasenya`,
+                    es: `Se ha producido un error al intentar cambiar la contraseña`,
+                    eng: `An error occurred while trying to change the password`
+                }
             });
         }
 
     } catch(error) {
         res.status(500).json({
-            message: `Error al canviar la contrasenya`
+            message: {
+                cat: `Error al canviar la contrasenya`,
+                es: `Error al cambiar la contraseña`,
+                eng: `Error changing the password`
+            }
         });
 
         LOGGER.error(`${ LOGGER_BASE } error changing the password for token: ${ token } - Error: ${ error }`);

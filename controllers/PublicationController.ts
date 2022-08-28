@@ -38,8 +38,13 @@ export const getAllPublications = async( _ = request, res = response ): Promise<
         }
     } catch (error) {
         LOGGER.error(`${ LOGGER_BASE } error obtaining all publications - Error: ${ error }`);
+
         res.status(500).json({
-            message: 'Error al obtenir les publicacions'
+            message: {
+                cat: 'Error al obtenir les publicacions',
+                es: 'Error al obtener las publicaciones',
+                eng: 'Error fetching posts'
+            }
         });
     }
 }
@@ -79,7 +84,11 @@ export const getPublications = async( req = request, res = response ): Promise<v
         LOGGER.error(`${ LOGGER_BASE } error obtaining publications - Error: ${ error }`);
 
         res.status(500).json({
-            message: 'Error al obtenir les publicacions'
+            message: {
+                cat: 'Error al obtenir les publicacions',
+                es: 'Error al obtener las publicaciones',
+                eng: 'Error fetching posts'
+            }
         });
         
     }
@@ -115,7 +124,11 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
         LOGGER.error(`${ LOGGER_BASE } error obtaining publications for backoffice - Error: ${ error }`);
 
         res.status(500).json({
-            message: 'Error al obtenir les publicacions'
+            message: {
+                cat: 'Error al obtenir les publicacions',
+                es: 'Error al obtener las publicaciones',
+                eng: 'Error fetching posts'
+            }
         });
     }
 }
@@ -151,7 +164,11 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
         LOGGER.error(`${ LOGGER_BASE } error obtaining publications by country: '${ params.country }' - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Error al obtenir les publicacions del pais: ${ params.country }`
+            message: {
+                cat: `Error al obtenir les publicacions del pais: ${ params.country }`,
+                es: `Error al obtener las publicaciones del país: ${ params.country }`,
+                eng: `Error getting country posts: ${ params.country }`
+            }
         });
     }
 }
@@ -187,7 +204,11 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
         LOGGER.error(`${ LOGGER_BASE } error obtaining publications by author: '${ params.authorId }' - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Error al obtenir les publicacions amb l'autor amb id: ${ params.authorId }`
+            message: {
+                cat: `Error al obtenir les publicacions amb l'autor amb id: ${ params.authorId }`,
+                es: `Error al obtener las publicaciones con el autor con id: ${ params.authorId }`,
+                eng: `Error getting posts with author id: ${ params.authorId }`
+            }
         });
     }
 }
@@ -204,14 +225,22 @@ export const getPublication = async( req = request, res = response ): Promise<vo
             res.json( fullPublication );
         } else {
             res.status(400).json({
-                message: `No s'ha trobat la publicacio amb id: ${ params.id }`
+                message: {
+                    cat: `No s'ha trobat la publicacio amb id: ${ params.id }`,
+                    es: `No se ha encontrado la publicacion con id: ${ params.id }`,
+                    eng: `Publication not found with id: ${ params.id }`
+                }
             });
         }
     } catch (error) {
         LOGGER.error(`${ LOGGER_BASE } error obtaining publication by id: '${ params.id }' - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Error al obtenir la publicacio amb id: ${ params.id }`
+            message: {
+                cat: `Error al obtenir la publicacio amb id: ${ params.id }`,
+                es: `No se ha encontrado la publicacion con id: ${ params.id }`,
+                eng: `Publication not found with id: ${ params.id }`
+            }
         });
     }
 }
@@ -348,18 +377,30 @@ export const editPublication = async( req = request, res = response ): Promise<v
             }
 
             res.status(200).json({
-                message: `S'ha actualitzat la publicació correctament`
+                message: {
+                    cat: `S'ha actualitzat la publicació correctament`,
+                    es: `Se ha actualizado correctamente la publicación`,
+                    eng: `Post updated successfully`
+                }
             });
         } else {
             res.status(400).json({
-                message: `No s'ha trobat la publicacio amb id: ${ params.id }`
+                message: {
+                    cat: `No s'ha trobat la publicacio amb id: ${ params.id }`,
+                    es: `No se ha encontrado la publicacion con id: ${ params.id }`,
+                    eng: `Publication not found with id: ${ params.id }`
+                }
             });
         }
     } catch (error) {
         LOGGER.error(`${ LOGGER_BASE } error editing publication by id: '${ params.id }' - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Error al editar la publicacio amb id: ${ params.id }`
+            message: {
+                cat: `Error al editar la publicacio amb id: ${ params.id }`,
+                es: `Error al editar la publicacion con id: ${ params.id }`,
+                eng: `error when editing the publication with id: ${ params.id }`
+            }
         });
     }
 }
@@ -446,7 +487,11 @@ export const createPublication = async( req = request, res = response ): Promise
         LOGGER.error(`${ LOGGER_BASE } error creating new publication - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Error al crear la publicació`
+            message: {
+                cat: `Error al crear la publicació`,
+                es: `Error al crear la publicación`,
+                eng: `Error creating post`
+            }
         });
     }
 }
@@ -487,7 +532,11 @@ export const reportPublication = async ( req = request, res = response ): Promis
         LOGGER.error(`${ LOGGER_BASE } error reporting publication by id: '${ params.publicationId }' - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Ha sorgit un error al intentar reportar la publicació amb la id: ${ params.publicationId }`
+            message: {
+                cat: `Ha sorgit un error al intentar reportar la publicació amb la id: ${ params.publicationId }`,
+                es: `Surgió un error al intentar reportar la publicación con la id: ${ params.publicationId }`,
+                eng: `An error occurred while trying to report the publication with id: ${ params.publicationId }`
+            }
         });
     }
 }
@@ -506,13 +555,21 @@ export const deletePublication = async( req = request, res = response ): Promise
         }
     }).then(_ => {
         res.status(200).json({
-            message: `S'ha eliminat correctament la publicació`
+            message: {
+                cat: `S'ha eliminat correctament la publicació`,
+                es: `Se ha eliminado correctamente la publicación`,
+                eng: `Post successfully deleted`
+            }
         });
     }).catch(error => {
         LOGGER.error(`${ LOGGER_BASE } error deleting publication by id: '${ params.publicationId }' - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Error al eliminar la publicació ${ params.publicationId }, no pertany al usuari o no existeix aquesta publicació`
+            message: {
+                cat: `Error al eliminar la publicació ${ params.publicationId }, no pertany al usuari o no existeix aquesta publicació`,
+                es: `Error al eliminar la publicación ${ params.publicationId }, no pertenece al usuario o no existe esta publicación`,
+                eng: `Error deleting publication ${ params.publicationId }, does not belong to user or this publication does not exist`
+            }
         });
     });
 }
@@ -528,13 +585,21 @@ export const deletePublicationBo = async( req = request, res = response ): Promi
         }
     }).then(_ => {
         res.status(200).json({
-            message: `S'ha eliminat correctament la publicació`
+            message: {
+                cat: `S'ha eliminat correctament la publicació`,
+                es: `Se ha eliminado correctamente la publicación`,
+                eng: `Post removed successfully`
+            }
         });
     }).catch(error => {
         LOGGER.error(`${ LOGGER_BASE } error deleting publication for backoffice by id: '${ params.publicationId }' - Error: ${ error }`);
 
         res.status(500).json({
-            message: `Error al eliminar la publicació ${ params.publicationId }`
+            message: {
+                cat: `Error al eliminar la publicació ${ params.publicationId }`,
+                es: `Error al eliminar la publicación ${ params.publicationId }`,
+                eng: `Error deleting publication ${ params.publicationId }`
+            }
         });
     });
 }
