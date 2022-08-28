@@ -15,8 +15,38 @@ import { DirectionModel } from '../models/Direction';
 import { ImageModel } from '../models/Image';
 import { getPageAndLimit } from '../helpers/Paginate';
 import { ParamsDictionary } from 'express-serve-static-core';
+// Helpers
+import { LOGGER } from '../helpers/Logger';
+
+export const getAllPublications = async( _ = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getAllPublications@PublicationController -`;
+
+    try {
+        const publications = await PublicationModel.findAll({
+            attributes: {
+                exclude: [
+                    'numberOfReports'
+                ]
+            }
+        });
+
+        if (publications instanceof Array && publications.length > 0) {
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
+            res.json(allPublications);
+        } else {
+            res.json( [] );
+        }
+    } catch (error) {
+        LOGGER.error(`${ LOGGER_BASE } error obtaining all publications - Error: ${ error }`);
+        res.status(500).json({
+            message: 'Error al obtenir les publicacions'
+        });
+    }
+}
 
 export const getPublications = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getPublications@PublicationController -`;
+
     const params: ParamsDictionary = req.params;
 
     try {
@@ -35,7 +65,7 @@ export const getPublications = async( req = request, res = response ): Promise<v
         const num: number = Math.abs(publications.count / 10);
         const numPages: number = num > 0 ? num : 1;
 
-        if (publications.rows instanceof Array && publications.rows.length > 0) {
+        if (publications != null && publications.rows instanceof Array && publications.rows.length > 0) {
             const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
             res.json({
                 publications: allPublications,
@@ -46,14 +76,18 @@ export const getPublications = async( req = request, res = response ): Promise<v
             res.json( [] );
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error obtaining publications - Error: ${ error }`);
+
         res.status(500).json({
             message: 'Error al obtenir les publicacions'
         });
+        
     }
 }
 
 export const getPublicationsForBo = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getPublicationsForBo@PublicationController -`;
+
     const params: ParamsDictionary = req.params;
 
     try {
@@ -78,7 +112,8 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
             res.json( [] );
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error obtaining publications for backoffice - Error: ${ error }`);
+
         res.status(500).json({
             message: 'Error al obtenir les publicacions'
         });
@@ -86,6 +121,8 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
 }
 
 export const getPublicationsByCountry = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getPublicationsByCountry@PublicationController -`;
+
     const params: ParamsDictionary = req.params;
 
     try {
@@ -111,7 +148,8 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
             res.status(200).json( [] );
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error obtaining publications by country: '${ params.country }' - Error: ${ error }`);
+
         res.status(500).json({
             message: `Error al obtenir les publicacions del pais: ${ params.country }`
         });
@@ -119,6 +157,8 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
 }
 
 export const getPublicationsByAuthor = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getPublicationsByAuthor@PublicationController -`;
+
     const params: ParamsDictionary = req.params;
 
     try {
@@ -144,14 +184,17 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
             res.status(200).json( [] );
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error obtaining publications by author: '${ params.authorId }' - Error: ${ error }`);
+
         res.status(500).json({
-            message: `Error al obteniur les publicacions amb l'autor amb id: ${ params.authorId }`
+            message: `Error al obtenir les publicacions amb l'autor amb id: ${ params.authorId }`
         });
     }
 }
 
 export const getPublication = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `getPublication@PublicationController -`;
+
     const params = req.params;
 
     try {
@@ -165,7 +208,8 @@ export const getPublication = async( req = request, res = response ): Promise<vo
             });
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error obtaining publication by id: '${ params.id }' - Error: ${ error }`);
+
         res.status(500).json({
             message: `Error al obtenir la publicacio amb id: ${ params.id }`
         });
@@ -173,6 +217,8 @@ export const getPublication = async( req = request, res = response ): Promise<vo
 }
 
 export const editPublication = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `editPublication@PublicationController -`;
+
     const params = req.params;
     const body: Publication = req.body;
 
@@ -310,7 +356,8 @@ export const editPublication = async( req = request, res = response ): Promise<v
             });
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error editing publication by id: '${ params.id }' - Error: ${ error }`);
+
         res.status(500).json({
             message: `Error al editar la publicacio amb id: ${ params.id }`
         });
@@ -318,6 +365,8 @@ export const editPublication = async( req = request, res = response ): Promise<v
 }
 
 export const createPublication = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `createPublication@PublicationController -`;
+
     const body: Publication = req.body;
 
     try {
@@ -394,7 +443,8 @@ export const createPublication = async( req = request, res = response ): Promise
             contents: contents
         });
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error creating new publication - Error: ${ error }`);
+
         res.status(500).json({
             message: `Error al crear la publicació`
         });
@@ -402,6 +452,8 @@ export const createPublication = async( req = request, res = response ): Promise
 }
 
 export const reportPublication = async ( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `reportPublication@PublicationController -`;
+
     const params = req.params;
 
     try {
@@ -432,7 +484,8 @@ export const reportPublication = async ( req = request, res = response ): Promis
             });
         }
     } catch (error) {
-        console.error(error);
+        LOGGER.error(`${ LOGGER_BASE } error reporting publication by id: '${ params.publicationId }' - Error: ${ error }`);
+
         res.status(500).json({
             message: `Ha sorgit un error al intentar reportar la publicació amb la id: ${ params.publicationId }`
         });
@@ -440,58 +493,50 @@ export const reportPublication = async ( req = request, res = response ): Promis
 }
 
 export const deletePublication = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `deletePublication@PublicationController -`;
+
     const params = req.params;
 
-    try {
-        const user: JWTUser = await getCurrentUserByToken(req, res);
+    const user: JWTUser = await getCurrentUserByToken(req, res);
 
-        PublicationModel.destroy({
-            where: {
-                id: params.publicationId,
-                authorId: user.id,
-            }
-        }).then(_ => {
-            res.status(200).json({
-                message: `S'ha eliminat correctament la publicació`
-            });
-        }).catch(error => {
-            console.error(error);
-            res.status(500).json({
-                message: `Error al eliminar la publicació ${ params.publicationId }, no pertany al usuari o no existeix aquesta publicació`
-            });
+    PublicationModel.destroy({
+        where: {
+            id: params.publicationId,
+            authorId: user.id,
+        }
+    }).then(_ => {
+        res.status(200).json({
+            message: `S'ha eliminat correctament la publicació`
         });
-    } catch (error) {
-        console.error(error);
+    }).catch(error => {
+        LOGGER.error(`${ LOGGER_BASE } error deleting publication by id: '${ params.publicationId }' - Error: ${ error }`);
+
         res.status(500).json({
-            message: `Ha sorgit un error al intentar esborrar la publicació amb la id: ${ params.publicationId }`
+            message: `Error al eliminar la publicació ${ params.publicationId }, no pertany al usuari o no existeix aquesta publicació`
         });
-    }
+    });
 }
 
 export const deletePublicationBo = async( req = request, res = response ): Promise<void> => {
+    const LOGGER_BASE = `deletePublication@PublicationController -`;
+
     const params = req.params;
 
-    try {
-        PublicationModel.destroy({
-            where: {
-                id: params.publicationId
-            }
-        }).then(_ => {
-            res.status(200).json({
-                message: `S'ha eliminat correctament la publicació`
-            });
-        }).catch(error => {
-            console.error(error);
-            res.status(500).json({
-                message: `Error al eliminar la publicació ${ params.publicationId }`
-            });
+    PublicationModel.destroy({
+        where: {
+            id: params.publicationId
+        }
+    }).then(_ => {
+        res.status(200).json({
+            message: `S'ha eliminat correctament la publicació`
         });
-    } catch (error) {
-        console.error(error);
+    }).catch(error => {
+        LOGGER.error(`${ LOGGER_BASE } error deleting publication for backoffice by id: '${ params.publicationId }' - Error: ${ error }`);
+
         res.status(500).json({
-            message: `Ha sorgit un error al intentar esborrar la publicació amb la id: ${ params.publicationId }`
+            message: `Error al eliminar la publicació ${ params.publicationId }`
         });
-    }
+    });
 }
 
 const getFullInfoOfPublications = async (publications: any, showBoFields?: boolean): Promise<Publication[]> => {

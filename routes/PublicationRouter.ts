@@ -11,7 +11,8 @@ import {
     getPublicationsForBo,
     editPublication,
     deletePublicationBo,
-    reportPublication
+    reportPublication,
+    getAllPublications
 } from "../controllers/PublicationController";
 
 
@@ -19,6 +20,9 @@ export const PublicationRouter: Router = Router();
 
 PublicationRouter.get('/', [
 ], getPublications);
+
+PublicationRouter.get('/all', [
+], getAllPublications);
 
 PublicationRouter.get('/backoffice', [
     authorizeAdmin

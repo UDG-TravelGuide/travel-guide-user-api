@@ -97,7 +97,7 @@ export const recoverPassword = async ( req = request, res = response ): Promise<
                                 message: `Ha sorgit un error al intentar enviar un correu de recuperació de contrasenya`
                             });
                         } else {
-                            LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }, ${ info }`);
+                            LOGGER.info(`${ LOGGER_BASE } Recover mail sent to ${ email }`);
                             res.status(200).json({
                                 message: `S'ha enviat el mail de recuperació de contrasenya correctament`
                             });
