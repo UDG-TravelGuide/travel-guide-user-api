@@ -179,24 +179,14 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
     const params: ParamsDictionary = req.params;
 
     try {
-        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(params);
 
-        const publications: any = await PublicationModel.findAndCountAll({ 
-            where: { authorId: params.authorId },
-            limit: limit,
-            offset: offset
+        const publications: any = await PublicationModel.findAll({ 
+            where: { authorId: params.authorId }
         });
 
-        const num: number = Math.abs(publications.count / 10);
-        const numPages: number = num > 0 ? num : 1;
-
-        if (publications.rows instanceof Array && publications.rows.length > 0) {
-            const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
-            res.json({
-                publications: allPublications,
-                page: offset,
-                pages: numPages
-            });
+        if (publications instanceof Array && publications.length > 0) {
+            const allPublications: Publication[] = await getFullInfoOfPublications(publications);
+            res.json( allPublications );
         } else {
             res.status(200).json( [] );
         }
