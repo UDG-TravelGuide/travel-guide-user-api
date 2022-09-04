@@ -27,7 +27,10 @@ export const getAllPublications = async( _ = request, res = response ): Promise<
                 exclude: [
                     'numberOfReports'
                 ]
-            }
+            },
+            order: [
+                ['id', 'ASC']
+            ]
         });
 
         if (publications instanceof Array && publications.length > 0) {
@@ -65,7 +68,10 @@ export const getPublications = async( req = request, res = response ): Promise<v
                 exclude: [
                     'numberOfReports'
                 ]
-            }
+            },
+            order: [
+                ['id', 'ASC']
+            ]
         });
 
         const num: number = Math.abs(publications.count / 10);
@@ -106,7 +112,10 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
         const publications = await PublicationModel.findAndCountAll({
             limit: limit,
             offset: offset,
-            subQuery: false
+            subQuery: false,
+            order: [
+                ['id', 'ASC']
+            ]
         });
 
         const num: number = Math.abs(publications.count / 10);
@@ -148,7 +157,10 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
             where: { countryAlphaCode: params.country },
             limit: limit,
             offset: offset,
-            subQuery: false
+            subQuery: false,
+            order: [
+                ['id', 'ASC']
+            ]
         });
 
         const num: number = Math.abs(publications.count / 10);
@@ -185,7 +197,10 @@ export const getPublicationsByAuthor = async( req = request, res = response ): P
     try {
 
         const publications: any = await PublicationModel.findAll({ 
-            where: { authorId: params.authorId }
+            where: { authorId: params.authorId },
+            order: [
+                ['id', 'ASC']
+            ]
         });
 
         if (publications instanceof Array && publications.length > 0) {

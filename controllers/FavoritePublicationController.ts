@@ -27,7 +27,10 @@ export const getFavoritePublicationsOfUser = async ( req = request, res = respon
         const favorites: any = await FavoritePublicationUserModel.findAndCountAll({ 
             where: { userId: user.id },
             limit: limit,
-            offset: offset
+            offset: offset,
+            order: [
+                ['id', 'ASC']
+            ]
         });
         let publications: Publication[] = [];
 
