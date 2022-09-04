@@ -52,10 +52,10 @@ export const getAllPublications = async( _ = request, res = response ): Promise<
 export const getPublications = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getPublications@PublicationController -`;
 
-    const params: ParamsDictionary = req.params;
+    const query: any = req.query;
 
     try {
-        const { limit, offset } = getPageAndLimit(params);
+        const { limit, offset } = getPageAndLimit(query);
 
         const publications = await PublicationModel.findAndCountAll({
             limit: limit,
@@ -75,7 +75,7 @@ export const getPublications = async( req = request, res = response ): Promise<v
             const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
             res.json({
                 publications: allPublications,
-                page: (offset * 10),
+                page: offset,
                 pages: numPages
             });
         } else {
