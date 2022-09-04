@@ -60,6 +60,7 @@ export const getPublications = async( req = request, res = response ): Promise<v
         const publications = await PublicationModel.findAndCountAll({
             limit: limit,
             offset: offset,
+            subQuery: false,
             attributes: {
                 exclude: [
                     'numberOfReports'
@@ -75,7 +76,8 @@ export const getPublications = async( req = request, res = response ): Promise<v
             res.json({
                 publications: allPublications,
                 page: offset,
-                pages: numPages
+                pages: numPages,
+                subQuery: false
             });
         } else {
             res.json( [] );
@@ -105,6 +107,7 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
         const publications = await PublicationModel.findAndCountAll({
             limit: limit,
             offset: offset,
+            subQuery: false
         });
 
         const num: number = Math.abs(publications.count / 10);
@@ -144,7 +147,8 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
         const publications: any = await PublicationModel.findAndCountAll({
             where: { countryAlphaCode: params.country },
             limit: limit,
-            offset: offset
+            offset: offset,
+            subQuery: false
         });
 
         const num: number = Math.abs(publications.count / 10);
