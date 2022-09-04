@@ -4,6 +4,8 @@ export const getPageAndLimit = (params: ParamsDictionary): { limit: number, offs
     const limit: number = (params.limit != null && params.limit != undefined) ? Number(params.limit) : 10;
     const offset: number = (params.page != null && params.page != undefined) ? Number(params.page) : 0;
 
+    console.log('OFFSET PAGE', offset);
+
     return {
         limit,
         offset
