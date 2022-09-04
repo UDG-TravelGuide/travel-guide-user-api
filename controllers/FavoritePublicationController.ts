@@ -17,10 +17,10 @@ import { LOGGER } from '../helpers/Logger';
 export const getFavoritePublicationsOfUser = async ( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getFavoritePublicationsOfUser@FavoritePublicationController -`;
 
-    const params: ParamsDictionary = req.params;
+    const query: any = req.query;
 
     try {
-        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(params);
+        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(query);
         
         const user: JWTUser = await getCurrentUserByToken(req, res);
 
