@@ -98,10 +98,10 @@ export const getPublications = async( req = request, res = response ): Promise<v
 export const getPublicationsForBo = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getPublicationsForBo@PublicationController -`;
 
-    const params: ParamsDictionary = req.params;
+    const query: any = req.query;
 
     try {
-        const { limit, offset } = getPageAndLimit(params);
+        const { limit, offset } = getPageAndLimit(query);
 
         const publications = await PublicationModel.findAndCountAll({
             limit: limit,
@@ -138,10 +138,11 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
 export const getPublicationsByCountry = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getPublicationsByCountry@PublicationController -`;
 
-    const params: ParamsDictionary = req.params;
+    const query: any = req.query;
+    const params: any = req.params;
 
     try {
-        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(params);
+        const { limit, offset } : { limit: number; offset: number; } = getPageAndLimit(query);
 
         const publications: any = await PublicationModel.findAndCountAll({
             where: { countryAlphaCode: params.country },
