@@ -75,9 +75,8 @@ export const getPublications = async( req = request, res = response ): Promise<v
             const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
             res.json({
                 publications: allPublications,
-                page: offset,
-                pages: numPages,
-                subQuery: false
+                page: (offset * 10),
+                pages: numPages
             });
         } else {
             res.json( [] );
