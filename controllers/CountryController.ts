@@ -7,7 +7,7 @@ export const getAllCountries = async( _ = request, res = response ): Promise<voi
     const LOGGER_BASE = `getAllCountries@CountryController -`;
 
     try {
-        get(`https://restcountries.com/v3.1/all`, (resp) => {
+        get(`https://restcountries.com/v2/all?fields=name,capital,currencies`, (resp) => {
             let data = '';
 
             resp.on('data', (chunk) => {
