@@ -87,12 +87,13 @@ export const addPointToPublication = async ( req = request, res = response ): Pr
 
                     const points = Number(publication.points) + 1;
     
-                    await PublicationModel.update(
+                    await publication.update(
                         {
                             points: points
                         },
                         { where: { id: params.publicationId } }
                     );
+                    await publication.save();
     
                     const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
     
@@ -180,12 +181,13 @@ export const removePointToPublication = async ( req = request, res = response ):
                         points = 0;
                     }
     
-                    await PublicationModel.update(
+                    await publication.update(
                         {
                             points: points
                         },
                         { where: { id: params.publicationId } }
                     );
+                    await publication.save();
     
                     const userBd: any = await UserModel.findOne({ where: { id: publication.authorId } });
     
