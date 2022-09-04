@@ -75,7 +75,7 @@ export const getPublications = async( req = request, res = response ): Promise<v
             const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
             res.json({
                 publications: allPublications,
-                page: offset,
+                page: (offset / 10),
                 pages: numPages
             });
         } else {
@@ -116,7 +116,7 @@ export const getPublicationsForBo = async( req = request, res = response ): Prom
             const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows, true);
             res.json({
                 publications: allPublications,
-                page: offset,
+                page: (offset / 10),
                 pages: numPages
             });
         } else {
@@ -158,7 +158,7 @@ export const getPublicationsByCountry = async( req = request, res = response ): 
             const allPublications: Publication[] = await getFullInfoOfPublications(publications.rows);
             res.json({
                 publications: allPublications,
-                page: offset,
+                page: (offset / 10),
                 pages: numPages
             });
         } else {
