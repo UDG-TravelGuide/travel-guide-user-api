@@ -53,7 +53,7 @@ export class Server {
         this._app.use( cors() );
 
         // Configura el parser JSON per lectura i escriptura
-        this._app.use( express.json() );
+        this._app.use( express.json({ limit: '50mb' }) );
 
         // Directori public
         this._app.use( express.static('public') );
