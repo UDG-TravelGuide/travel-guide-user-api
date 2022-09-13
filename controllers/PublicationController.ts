@@ -1,5 +1,5 @@
-import { RouteModel } from './../models/Route';
 import { response, request } from 'express';
+import { Op } from 'sequelize';
 // Controllers
 import { getCurrentUserByToken } from './UserController';
 // Interfaces
@@ -15,9 +15,9 @@ import { DirectionModel } from '../models/Direction';
 import { ImageModel } from '../models/Image';
 import { getPageAndLimit } from '../helpers/Paginate';
 import { ParamsDictionary } from 'express-serve-static-core';
+import { RouteModel } from './../models/Route';
 // Helpers
 import { LOGGER } from '../helpers/Logger';
-import { Op } from 'sequelize/types';
 
 export const getAllPublications = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getAllPublications@PublicationController -`;
