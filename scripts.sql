@@ -68,7 +68,7 @@ CREATE TABLE user_publication_points (
 CREATE TABLE contents (
 	id serial4 NOT NULL,
 	"type" varchar NOT NULL,
-	value varchar NOT NULL,
+	value varchar NULL,
 	"position" int4 NOT NULL,
 	publication_id int4 NOT NULL,
 	CONSTRAINT contents_pk PRIMARY KEY (id),
