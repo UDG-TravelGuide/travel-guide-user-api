@@ -17,7 +17,7 @@ import { getPageAndLimit } from '../helpers/Paginate';
 import { ParamsDictionary } from 'express-serve-static-core';
 // Helpers
 import { LOGGER } from '../helpers/Logger';
-import Op from 'sequelize/types/operators';
+import { Op } from 'sequelize/types';
 
 export const getAllPublications = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getAllPublications@PublicationController -`;
