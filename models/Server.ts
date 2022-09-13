@@ -1,4 +1,4 @@
-import express from 'express';    
+import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
@@ -57,6 +57,9 @@ export class Server {
 
         // Directori public
         this._app.use( express.static('public') );
+
+        // Limit de mida d'imatge
+        this._app.use( express.urlencoded({ limit: '100mb', extended: true }) );
     }
 
     private _initRoutes(): void {
