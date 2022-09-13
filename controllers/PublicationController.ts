@@ -17,21 +17,47 @@ import { getPageAndLimit } from '../helpers/Paginate';
 import { ParamsDictionary } from 'express-serve-static-core';
 // Helpers
 import { LOGGER } from '../helpers/Logger';
+import Op from 'sequelize/types/operators';
 
-export const getAllPublications = async( _ = request, res = response ): Promise<void> => {
+export const getAllPublications = async( req = request, res = response ): Promise<void> => {
     const LOGGER_BASE = `getAllPublications@PublicationController -`;
 
+    const query: any = req.query;
+
     try {
-        const publications = await PublicationModel.findAll({
-            attributes: {
-                exclude: [
-                    'numberOfReports'
+
+        const title: string = query.title;
+
+        let publications: any;
+
+        if (title) {
+            publications = await PublicationModel.findAll({
+                attributes: {
+                    exclude: [
+                        'numberOfReports'
+                    ]
+                },
+                order: [
+                    ['id', 'ASC']
+                ],
+                where: {
+                    title: {
+                        [Op.like]: `%${ title }%`
+                    }
+                }
+            });
+        } else {
+            publications = await PublicationModel.findAll({
+                attributes: {
+                    exclude: [
+                        'numberOfReports'
+                    ]
+                },
+                order: [
+                    ['id', 'ASC']
                 ]
-            },
-            order: [
-                ['id', 'ASC']
-            ]
-        });
+            });
+        }
 
         if (publications instanceof Array && publications.length > 0) {
             const allPublications: Publication[] = await getFullInfoOfPublications(publications);
