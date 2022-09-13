@@ -19,7 +19,7 @@ const getContent = () => {
             },
             value: {
                 type: STRING,
-                allowNull: false
+                allowNull: true
             },
             position: {
                 type: INTEGER,
