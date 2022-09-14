@@ -26,7 +26,11 @@ export const getAllPublications = async( req = request, res = response ): Promis
 
     try {
 
-        const title: string = query.title.toLowerCase();
+        let title: string = query.title;
+
+        if (title != undefined && title != null) {
+            title = title.toLowerCase();
+        }
 
         let publications: any;
 
