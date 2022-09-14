@@ -28,13 +28,11 @@ export const getAllPublications = async( req = request, res = response ): Promis
 
         let title: string = query.title;
 
-        if (title != undefined && title != null) {
-            title = title.toLowerCase();
-        }
-
         let publications: any;
 
         if (title) {
+            title = title.toLowerCase();
+
             publications = await PublicationModel.findAll({
                 attributes: {
                     exclude: [
