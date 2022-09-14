@@ -1,5 +1,5 @@
 import { response, request } from 'express';
-import { Op } from 'sequelize';
+import { Op, fn, col, where } from 'sequelize';
 // Controllers
 import { getCurrentUserByToken } from './UserController';
 // Interfaces
@@ -26,7 +26,7 @@ export const getAllPublications = async( req = request, res = response ): Promis
 
     try {
 
-        const title: string = query.title;
+        const title: string = query.title.toLowerCase();
 
         let publications: any;
 
@@ -41,9 +41,7 @@ export const getAllPublications = async( req = request, res = response ): Promis
                     ['id', 'ASC']
                 ],
                 where: {
-                    title: {
-                        [Op.like]: `%${ title }%`
-                    }
+                    title:  where(fn('LOWER', col('title')), 'LIKE', `%${ title }%`)
                 }
             });
         } else {
